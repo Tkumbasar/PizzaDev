@@ -1,0 +1,30 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+    <h1>Votre Profile</h1>
+
+    {% if app.flashes('success') %}
+        <div class="alert alert-success">
+            {% for message in app.flashes('success') %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if deleteForm is defined %}
+        {{ form_start(deleteForm) }}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete Profile</button>
+            {{ form_rest(deleteForm) }}
+        {{ form_end(deleteForm) }}
+    {% endif %}
+
+    {{ form_start(form) }}
+        {# Render all form fields here #}
+        {{ form_widget(form) }}
+
+        <button type="submit" class="btn btn-primary">Save Profile</button>
+    {{ form_end(form) }}
+{% endblock %}
