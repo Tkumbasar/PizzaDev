@@ -33,8 +33,9 @@ class HomeController extends AbstractController
 
         return $this->render('home/index.html.twig', [
             'products' => $productRepository->findAllPaginated($request->query->getInt('page', 1)),
-            'menus' => $menus
+            'menus' => $menus,
+            'stripe_public_key' => $_ENV['STRIPE_PUBLIC_KEY']
         ]);
     }
-   
+    
 }
