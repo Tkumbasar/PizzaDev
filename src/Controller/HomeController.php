@@ -3,21 +3,21 @@
 namespace App\Controller;
 
 use App\Repository\MenuRepository;
+use App\Repository\ProductRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+
 
 class HomeController extends AbstractController
 {
-
-    #[Route('/', name: 'app_home')]
-    public function index(Request $request, MenuRepository $menuRepository): Response
+    
+    #[Route('/', name: 'app_home' )]
+    public function index(Request $request, MenuRepository $menuRepository,ProductRepository $productRepository): Response
     {
         $session = $request->getSession();
-       
         $currentDate = (new \DateTime())->format('Y-m-d');
 
     // Vérifiez si les menus quotidiens sont déjà dans la session et s'ils sont pour aujourd'hui
@@ -32,7 +32,9 @@ class HomeController extends AbstractController
         }
 
         return $this->render('home/index.html.twig', [
-            'menus' => $menus,
+            'products' => $productRepository->findAllPaginated($request->query->getInt('page', 1)),
+            'menus' => $menus
         ]);
     }
+   
 }

@@ -1,36 +1,4 @@
-# easy_admin_bundle:
-#     resource: '@EasyAdminBundle/src/Controller/'
-#     type: annotation
-#     prefix: /admin
 
-# app:
-#     resource: '../src/Controller/'
-#     type: annotation
-
-# index:
-#     path: /
-#     controller: App\Controller\HomeController::index
-
-# app_login:
-#     path: /login
-#     controller: App\Controller\SecurityController::login
-
-# app_logout:
-#     path: /logout
-
-# app_register:
-#     path: /register
-#     controller: 'App\Controller\RegistrationController::register'
-
-# app_verify_email:
-#     path: /verify/email
-#     controller: 'App\Controller\RegistrationController::verifyUserEmail'
-# app_menu:
-#     path: /menu
-#     controller: 'App\Controller\MenuController::menu'
-# app_admin:
-#     path: /admin
-#     controller: 'App\Controller\Admin\AdminDashboardController::index'
 controllers:
     resource:
         path: ../src/Controller/
