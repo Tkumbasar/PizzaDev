@@ -39,7 +39,7 @@ class ProductRepository extends ServiceEntityRepository
             $products = $this->paginatorInterface->paginate(
             $query, // Query à paginer
             $page, // Numéro de page
-            9 // Nombre d'éléments par page
+            2 // Nombre d'éléments par page
            );
 
            return $products;

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\MenuType;
 use App\Repository\MenuRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,24 +11,27 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MenuController extends AbstractController
 {
-   
-    private $menuRepository;
-   
-
+   private $menuRepository;
 
     public function __construct(MenuRepository $menuRepository)
     {
-       
+       $this->menuRepository= $menuRepository;
     }
 
-    // #[Route('/', name: 'app_home')]
-    // public function index(): Response
+    #[Route('/menuChef', name: 'app_menu')]
+    public function index(): Response
+    {
+        $menus = $this->menuRepository->findAll();
+
+        return $this->render('home/index.html.twig', [ // ici la vue pour Crud des menus par le role chef
+            'menus' => $menus,
+        ]);
+    }
+
+    // public function new (Request $request): Response
     // {
-    //     $menus = $this->menuRepository->findAll();
-
-    //     return $this->render('home/index.html.twig', [
-    //         'menus' => $menus,
-    //     ]);
+    //     $menu =new Menu();
+    //     $form = $this->createForm(MenuType::class,$menu);
+    //     $form ->handleRequest($request);
     // }
-
 }
