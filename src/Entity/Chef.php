@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
+use App\Entity\User; 
 use App\Repository\ChefRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: ChefRepository::class)]
 class Chef
 {
@@ -24,8 +28,6 @@ class Chef
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date_of_birthday = null;
-
-   
 
     #[ORM\Column(length: 255)]
     private ?string $phone = null;
@@ -46,7 +48,8 @@ class Chef
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userChef = null;
 
-    
+    #[Vich\UploadableField(mapping: 'chef_images', fileNameProperty: 'picture')]
+    private ?File $imageFile = null;
 
     
     public function __construct()
@@ -122,6 +125,15 @@ class Chef
 
         return $this;
     }
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
 
     public function getGender(): ?string
     {
@@ -176,7 +188,7 @@ class Chef
 
         return $this;
     }
-
+    
    
 
 

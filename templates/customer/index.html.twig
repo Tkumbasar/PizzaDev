@@ -1,30 +1,66 @@
 
 {% extends 'base.html.twig' %}
 
-{% block title %}Profile{% endblock %}
-
 {% block body %}
-    <h1>Votre Profile</h1>
-
-    {% if app.flashes('success') %}
-        <div class="alert alert-success">
-            {% for message in app.flashes('success') %}
-                {{ message }}
-            {% endfor %}
+<section class="bg-white dark:bg-gray-900">
+    <div class="max-w-2xl px-4 py-8 mx-auto lg:py-16">
+        <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Update Profile</h2>
+        {{ form_start(form) }}
+        <div class="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
+            <div class="sm:col-span-2">
+                <label for="{{ form.name.vars.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                {{ form_widget(form.name, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'}}) }}
+            </div>
+            <div class="w-full">
+                <label for="{{ form.firstname.vars.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First Name</label>
+                {{ form_widget(form.firstname, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'}}) }}
+            </div>
+            <div class="w-full">
+                <label for="{{ form.gender.vars.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
+                {{ form_widget(form.gender, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'}}) }}
+            </div>
+            <div class="w-full">
+                <label for="{{ form.dateOfBirthday.vars.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date of Birth</label>
+                {{ form_widget(form.dateOfBirthday, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'}}) }}
+            </div>
+            <div class="w-full">
+                <label for="{{ form.phone.vars.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                {{ form_widget(form.phone, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'}}) }}
+            </div>
+            <div class="w-full">
+                <label for="{{ form.city.vars.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
+                {{ form_widget(form.city, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'}}) }}
+            </div>
+            <div class="sm:col-span-2">
+                <label for="{{ form.adress.vars.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                {{ form_widget(form.adress, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'}}) }}
+            </div>
         </div>
-    {% endif %}
-
-    {% if deleteForm is defined %}
-        {{ form_start(deleteForm) }}
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete Profile</button>
-            {{ form_rest(deleteForm) }}
-        {{ form_end(deleteForm) }}
-    {% endif %}
-
-    {{ form_start(form) }}
-        {# Render all form fields here #}
-        {{ form_widget(form) }}
-
-        <button type="submit" class="btn btn-primary">Save Profile</button>
-    {{ form_end(form) }}
+        <div class="flex items-center space-x-4">
+            <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                Save Profile
+            </button>
+            <button type="button" class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900" data-url="{{ path('customer_delete') }}">
+                <svg class="w-5 h-5 mr-1 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                Delete Profile
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ customer.id) }}">
+            </button>
+        </div>
+        {% if is_granted('ROLE_USER') and not app.user.chef %}
+            <div class="mt-6">
+                <form method="post" action="{{ path('chef_request_index') }}">
+                    <button type="submit" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                        Submit Chef Request
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+        {{ form_end(form) }}
+    </div>
+</section>
+<script src="{{ asset('javascript/profile.js') }}"></script>
 {% endblock %}
+
+

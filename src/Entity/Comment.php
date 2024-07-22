@@ -21,18 +21,18 @@ class Comment
     #[ORM\Column(length: 255)]
     private ?string $comment = null;
 
-    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'comments')]
     private ?Customer $customer = null;
 
     /**
      * @var Collection<int, Menu>
      */
     #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'comments')]
-    private Collection $menu;
+    private Collection $menus;
 
     public function __construct()
     {
-        $this->menu = new ArrayCollection();
+        $this->menus = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -79,15 +79,15 @@ class Comment
     /**
      * @return Collection<int, Menu>
      */
-    public function getMenu(): Collection
+    public function getMenus(): Collection
     {
-        return $this->menu;
+        return $this->menus;
     }
 
     public function addMenu(Menu $menu): static
     {
-        if (!$this->menu->contains($menu)) {
-            $this->menu->add($menu);
+        if (!$this->menus->contains($menu)) {
+            $this->menus->add($menu);
         }
 
         return $this;
@@ -95,7 +95,7 @@ class Comment
 
     public function removeMenu(Menu $menu): static
     {
-        $this->menu->removeElement($menu);
+        $this->menus->removeElement($menu);
 
         return $this;
     }

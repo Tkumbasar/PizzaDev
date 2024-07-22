@@ -2,13 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\Chef;
-use App\Entity\Comment;
 use App\Entity\Menu;
-use App\Entity\Order;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,28 +16,25 @@ class MenuType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('price')
-            ->add('picture')
-            ->add('description')
-            ->add('title')
-            ->add('products', EntityType::class, [
+            ->add('title', TextType::class, [
+                'label' => 'Titre du Menu',
+                ])
+            ->add('picture', TextType::class, [
+                    'label' => 'Image du Menu',
+            ])
+            ->add('product', EntityType::class, [
                 'class' => Product::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
                 'multiple' => true,
+                'by_reference' => false, 
             ])
-            ->add('chef', EntityType::class, [
-                'class' => Chef::class,
-                'choice_label' => 'id',
+            ->add('price', NumberType::class, [
+                'label' => 'Prix du Menu',
+                'html5' => true,
+                'attr' => ['min' => 0],
             ])
-            ->add('comments', EntityType::class, [
-                'class' => Comment::class,
-                'choice_label' => 'id',
-                'multiple' => true,
-            ])
-            ->add('orders', EntityType::class, [
-                'class' => Order::class,
-                'choice_label' => 'id',
-                'multiple' => true,
+            ->add('description', TextType::class, [
+                'label' => 'Description du Menu',
             ])
         ;
     }

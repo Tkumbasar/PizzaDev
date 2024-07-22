@@ -43,7 +43,7 @@ class Customer
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'Customer')]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'customer')]
     private Collection $comments;
 
     /**

@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
+use App\Entity\User;
 use App\Form\CustomerType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,15 +26,13 @@ class CustomerController extends AbstractController
     {
         $user = $this->getUser();
 
-        // Vérifie si l'utilisateur est connecté avant de continuer
-        if (!$user) {
-            throw $this->createAccessDeniedException('User must be logged in.');
+        if (!$user instanceof User) {
+            return new JsonResponse(['message' => 'User must be logged in.'], Response::HTTP_FORBIDDEN);
         }
 
-        // Utiliser le repository pour vérifier si l'utilisateur a déjà un profil client
+        $user = $this->entityManager->getRepository(User::class)->find($user->getId());
         $customer = $this->entityManager->getRepository(Customer::class)->findOneBy(['userCustomer' => $user]);
 
-        // Si aucun profil client n'existe pour cet utilisateur, en créer un nouveau
         if (!$customer) {
             $customer = new Customer();
             $customer->setUserCustomer($user);
@@ -42,10 +42,13 @@ class CustomerController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user->setRoles(['ROLE_CUSTOMER']);
+            $this->entityManager->persist($user);
             $this->entityManager->persist($customer);
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Profile saved successfully!');
+            return $this->redirectToRoute('customer_profile');
         }
 
         return $this->render('customer/index.html.twig', [
@@ -55,25 +58,36 @@ class CustomerController extends AbstractController
     }
 
     #[Route('/profile/delete', name: 'customer_delete', methods: ['POST'])]
-    public function delete(Request $request): Response
+    public function delete(Request $request): JsonResponse
     {
         $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['message' => 'User must be logged in.'], Response::HTTP_FORBIDDEN);
+        }
+
+        $user = $this->entityManager->getRepository(User::class)->find($user->getId());
         $customer = $this->entityManager->getRepository(Customer::class)->findOneBy(['userCustomer' => $user]);
 
         if (!$customer) {
-            $this->addFlash('warning', 'You need to create a profile first.');
-            return $this->redirectToRoute('customer_profile');
+            return new JsonResponse(['message' => 'You need to create a profile first.'], Response::HTTP_BAD_REQUEST);
         }
 
-        if ($this->isCsrfTokenValid('delete'.$customer->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $customer->getId(), $request->request->get('_token'))) {
             $this->entityManager->remove($customer);
+
+            $user->setRoles(['ROLE_USER']);
+            $this->entityManager->persist($user);
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Profile deleted successfully!');
+            return new JsonResponse([
+                'message' => 'Profile deleted successfully!',
+                'redirect' => $this->generateUrl('homepage') // Assurez-vous que 'homepage' est bien défini
+            ]);
         } else {
-            $this->addFlash('error', 'Failed to delete profile.');
+            return new JsonResponse(['message' => 'Failed to delete profile.'], Response::HTTP_BAD_REQUEST);
         }
-
-        return $this->redirectToRoute('app_home'); // Adapter cette route selon votre application
     }
 }
+

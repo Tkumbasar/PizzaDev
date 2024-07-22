@@ -38,7 +38,8 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Chef', 'fas fa-utensils', Chef::class);
         yield MenuItem::linkToCrud('Product', 'fas fa-utensils', Product::class);
         yield MenuItem::linkToCrud('Category', 'fas fa-utensils', Category::class);
-        yield MenuItem::linkToCrud('User', 'fas fa-utensils', User::class);
-        
+        yield MenuItem::linkToCrud('User', 'fas fa-utensils', User::class)
+        ->setAction('index') // Définissez l'action par défaut pour l'entité User
+        ->setDefaultSort(['id' => 'DESC']);
     }
 }

@@ -1,0 +1,22 @@
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Menus pour la catégorie {{ category.name }}</h1>
+
+    <div>
+        {% if menus is not empty %}
+            <ul>
+                {% for menu in menus %}
+                    <li>
+                        <h2>{{ menu.name }}</h2>
+                        <p>{{ menu.description }}</p>
+                        {# Ajoutez d'autres informations sur le menu ici #}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Aucun menu disponible pour cette catégorie.</p>
+        {% endif %}
+    </div>
+{% endblock %}

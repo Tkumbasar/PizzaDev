@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
@@ -18,6 +17,9 @@ class Menu
 
     #[ORM\Column]
     private ?int $price = null;
+    
+    #[ORM\Column]
+    private ?string $title = null;
 
     #[ORM\Column(length: 255)]
     private ?string $picture = null;
@@ -37,7 +39,7 @@ class Menu
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: 'menu')]
+    #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: 'menus')]
     private Collection $comments;
 
     /**
@@ -45,9 +47,6 @@ class Menu
      */
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'orderMenu')]
     private Collection $orders;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $title = null;
 
     public function __construct()
     {
@@ -61,6 +60,17 @@ class Menu
         return $this->id;
     }
 
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
     public function getPrice(): ?int
     {
         return $this->price;
@@ -186,18 +196,6 @@ class Menu
         if ($this->orders->removeElement($order)) {
             $order->removeOrderMenu($this);
         }
-
-        return $this;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
 
         return $this;
     }

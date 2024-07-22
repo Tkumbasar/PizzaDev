@@ -17,9 +17,6 @@ class Order
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
-
-    #[ORM\Column]
     private ?int $totalPrice = null;
 
     /**
@@ -34,6 +31,11 @@ class Order
     #[ORM\ManyToMany(targetEntity: Customer::class, inversedBy: 'orders')]
     private Collection $orderCustomer;
 
+    #[ORM\OneToOne(inversedBy: 'orderPayment', cascade: ['persist', 'remove'])]
+    private ?Payment $orderPayment = null;
+
+   
+
     public function __construct()
     {
         $this->orderMenu = new ArrayCollection();
@@ -43,18 +45,6 @@ class Order
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
-    {
-        $this->created_at = $created_at;
-
-        return $this;
     }
 
     public function getTotalPrice(): ?int
@@ -116,4 +106,18 @@ class Order
 
         return $this;
     }
+
+    public function getOrderPayment(): ?Payment
+    {
+        return $this->orderPayment;
+    }
+
+    public function setOrderPayment(?Payment $orderPayment): static
+    {
+        $this->orderPayment = $orderPayment;
+
+        return $this;
+    }
+
+    
 }
