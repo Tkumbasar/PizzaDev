@@ -32,7 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    #[ORM\OneToOne(mappedBy: 'userCustomer', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'userCustomer', targetEntity:Customer::class , cascade: ['persist', 'remove'])]
     private ?Customer $customer = null;
 
     #[ORM\OneToOne(mappedBy: 'userChef', cascade: ['persist', 'remove'])]
@@ -194,8 +194,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->customer;
     }
 
-    public function setCustomer(Customer $customer): static
+    public function setCustomer(?Customer $customer): static
     {
+
+        if ($customer === null) {
+            $this->customer = null;
+            return $this;
+        }
+
         // set the owning side of the relation if necessary
         if ($customer->getUserCustomer() !== $this) {
             $customer->setUserCustomer($this);

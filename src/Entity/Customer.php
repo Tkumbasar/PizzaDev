@@ -52,7 +52,7 @@ class Customer
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'orderCustomer')]
     private Collection $orders;
 
-    #[ORM\OneToOne(inversedBy: 'Customer')]
+    #[ORM\OneToOne(inversedBy: 'customer')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userCustomer = null;
 

@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Customer;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
@@ -34,7 +35,10 @@ class CustomerCrudController extends AbstractCrudController
             DateField::new('date_of_birthday'),
             TelephoneField::new('phone'),
             TextField::new('city'),
-            TextField::new('adress','Adress'),
+            TextField::new('adress'),
+            AssociationField::new('userCustomer')
+                ->setLabel('User account')
+                ->setRequired(true),
         ];
     }
     

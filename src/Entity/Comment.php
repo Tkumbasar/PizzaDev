@@ -23,6 +23,8 @@ class Comment
 
     #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'comments')]
     private ?Customer $customer = null;
+    // #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'customer')]
+    // private Collection $comments;
 
     /**
      * @var Collection<int, Menu>

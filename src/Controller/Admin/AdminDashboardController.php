@@ -4,8 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Entity\Category;
 use App\Entity\Chef;
+use App\Entity\ChefRequest;
+use App\Entity\Comment;
 use App\Entity\Customer;
 use App\Entity\Menu;
+use App\Entity\Order;
+use App\Entity\Payment;
 use App\Entity\Product;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -38,8 +42,11 @@ class AdminDashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Chef', 'fas fa-utensils', Chef::class);
         yield MenuItem::linkToCrud('Product', 'fas fa-utensils', Product::class);
         yield MenuItem::linkToCrud('Category', 'fas fa-utensils', Category::class);
-        yield MenuItem::linkToCrud('User', 'fas fa-utensils', User::class)
-        ->setAction('index') // Définissez l'action par défaut pour l'entité User
-        ->setDefaultSort(['id' => 'DESC']);
+        yield MenuItem::linkToCrud('User', 'fas fa-utensils', User::class);
+        yield MenuItem::linkToCrud('ChefRequest', 'fas fa-utensils', ChefRequest::class);
+        yield MenuItem::linkToCrud('Order', 'fas fa-utensils', Order::class);
+        yield MenuItem::linkToCrud('Comment', 'fas fa-utensils', Comment::class);
+        yield MenuItem::linkToCrud('Payment', 'fas fa-utensils', Payment::class);
+       
     }
 }

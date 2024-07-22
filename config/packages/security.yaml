@@ -44,10 +44,9 @@ security:
         # - { path: ^/menus, roles: ROLE_USER }
         # - { path: ^/menu/.* /comment/add, roles: ROLE_USER }
         # - { path: ^/comment/.* /remove, roles: ROLE_USER }
-        # - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY}
-        # - { path: ^/home, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        
 
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/profile, roles: ROLE_USER }
         # - { path: ^/dasboard, roles: ROLE_USER }
 
         # - { path: ^/order, roles: ROLE_CUSTOMER }
