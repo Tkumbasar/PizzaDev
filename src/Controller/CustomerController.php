@@ -30,7 +30,6 @@ class CustomerController extends AbstractController
             return new JsonResponse(['message' => 'User must be logged in.'], Response::HTTP_FORBIDDEN);
         }
 
-        $user = $this->entityManager->getRepository(User::class)->find($user->getId());
         $customer = $this->entityManager->getRepository(Customer::class)->findOneBy(['userCustomer' => $user]);
 
         if (!$customer) {
@@ -42,8 +41,13 @@ class CustomerController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setRoles(['ROLE_CUSTOMER']);
-            $this->entityManager->persist($user);
+
+            if (!in_array('ROLE_CUSTOMER', $user->getRoles(), true)) {
+                $roles = array_merge($user->getRoles(), ['ROLE_CUSTOMER']);
+                $user->setRoles($roles);
+                $this->entityManager->persist($user);
+            }
+
             $this->entityManager->persist($customer);
             $this->entityManager->flush();
 
@@ -66,28 +70,21 @@ class CustomerController extends AbstractController
             return new JsonResponse(['message' => 'User must be logged in.'], Response::HTTP_FORBIDDEN);
         }
 
-        $user = $this->entityManager->getRepository(User::class)->find($user->getId());
         $customer = $this->entityManager->getRepository(Customer::class)->findOneBy(['userCustomer' => $user]);
 
         if (!$customer) {
-            return new JsonResponse(['message' => 'You need to create a profile first.'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['message' => 'Profile not found.'], Response::HTTP_BAD_REQUEST);
         }
+       
 
-        if ($this->isCsrfTokenValid('delete' . $customer->getId(), $request->request->get('_token'))) {
-            $this->entityManager->remove($customer);
+        $this->entityManager->remove($customer);
+        $this->entityManager->flush();
+        // dd('$customer');
+        $user->setRoles(array_diff($user->getRoles(), ['ROLE_CUSTOMER']));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
-            $user->setRoles(['ROLE_USER']);
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Profile deleted successfully!');
-            return new JsonResponse([
-                'message' => 'Profile deleted successfully!',
-                'redirect' => $this->generateUrl('homepage') // Assurez-vous que 'homepage' est bien défini
-            ]);
-        } else {
-            return new JsonResponse(['message' => 'Failed to delete profile.'], Response::HTTP_BAD_REQUEST);
-        }
+        $this->addFlash('success', 'Profile deleted successfully!');
+        return $this->redirectToRoute('app_home');
     }
 }
-
