@@ -66,7 +66,7 @@ class MenuController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        // Création d'un nouvel objet Comment
+        
         $comment = new Comment();
         $comment->setComment($text);
         $comment->setCustomer($user->getCustomer());
@@ -74,7 +74,7 @@ class MenuController extends AbstractController
         $comment->setCreatedAt(new \DateTimeImmutable());
 
         try {
-            // Persistance du commentaire dans la base de données
+            
             $em->persist($comment);
             $em->flush();
         } catch (\Exception $e) {
@@ -124,7 +124,7 @@ class MenuController extends AbstractController
 
 
 
-     ///// crud de menu
+     ///// crud de menu pour le chef !
    
 
      #[Route('/menu', name: 'menu_index')]
