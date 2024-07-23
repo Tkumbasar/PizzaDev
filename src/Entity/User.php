@@ -3,8 +3,6 @@
 namespace App\Entity;
 use App\Entity\Chef; 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -38,55 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'userChef', cascade: ['persist', 'remove'])]
     private ?Chef $chef = null;
 
-    private $isChefRequested = false;
-    private $isChefAccepted = false;
-    private $profileComplete = false;
-
-    /**
-     * @var Collection<int, ChefRequest>
-     */
-    #[ORM\OneToMany(targetEntity: ChefRequest::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $chefRequests;
-
-    public function __construct()
-    {
-        $this->chefRequests = new ArrayCollection();
-    }
-
-
-    public function getIsChefRequested(): ?bool
-    {
-        return $this->isChefRequested;
-    }
-
-    public function setIsChefRequested(bool $isChefRequested): self
-    {
-        $this->isChefRequested = $isChefRequested;
-        return $this;
-    }
-
-    public function getIsChefAccepted(): ?bool
-    {
-        return $this->isChefAccepted;
-    }
-
-    public function setIsChefAccepted(bool $isChefAccepted): self
-    {
-        $this->isChefAccepted = $isChefAccepted;
-        return $this;
-    }
-
-    public function getProfileComplete(): ?bool
-    {
-        return $this->profileComplete;
-    }
-
-    public function setProfileComplete(bool $profileComplete): self
-    {
-        $this->profileComplete = $profileComplete;
-        return $this;
-    }
-
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -217,8 +167,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->chef;
     }
 
-    public function setChef(Chef $chef): static
-    { 
+    public function setChef(?Chef $chef): static
+
+    {
+        if ($chef === null) {
+            $this->chef = null;
+            return $this;
+        }
+        
         $this->chef = $chef;
         // set the owning side of the relation if necessary
         if ($chef->getUserChef() !== $this) {
@@ -231,33 +187,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, ChefRequest>
-     */
-    public function getChefRequests(): Collection
-    {
-        return $this->chefRequests;
-    }
-
-    public function addChefRequest(ChefRequest $chefRequest): static
-    {
-        if (!$this->chefRequests->contains($chefRequest)) {
-            $this->chefRequests->add($chefRequest);
-            $chefRequest->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeChefRequest(ChefRequest $chefRequest): static
-    {
-        if ($this->chefRequests->removeElement($chefRequest)) {
-            // set the owning side to null (unless already changed)
-            if ($chefRequest->getUser() === $this) {
-                $chefRequest->setUser(null);
-            }
-        }
-
-        return $this;
-    }
 }

@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class MenuType extends AbstractType
 {
@@ -19,10 +20,12 @@ class MenuType extends AbstractType
             ->add('title', TextType::class, [
                 'label' => 'Titre du Menu',
                 ])
-            ->add('picture', TextType::class, [
-                    'label' => 'Image du Menu',
+            ->add('imageFile', VichImageType::class, [
+                'required' => false,
+                'download_uri' => false,
+                'label' => 'Profile Picture',
             ])
-            ->add('product', EntityType::class, [
+            ->add('products', EntityType::class, [
                 'class' => Product::class,
                 'choice_label' => 'name',
                 'multiple' => true,

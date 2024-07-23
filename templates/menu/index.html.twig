@@ -1,147 +1,223 @@
 
 
-{# templates/chef/menu.html.twig #}
+{# templates/menu.html.twig #}
+
 {% extends 'base.html.twig' %}
 
-{% block title %}Manage Menu{% endblock %}
+{% block title %}
+    {% if action == 'list' %}
+        Liste des Menus
+    {% elseif action == 'new' %}
+        Créer un Nouveau Menu
+    {% elseif action == 'edit' %}
+        Éditer le Menu : {{ menu.title }}
+    {% elseif action == 'show' %}
+        Détails du Menu : {{ menu.title }}
+    {% endif %}
+{% endblock %}
 
 {% block body %}
-    <h1>Manage Menu</h1>
-
-    <form id="menu-form">
-        <input type="hidden" id="menu-id">
-        <div>
-            <label for="menu-name">Name</label>
-            <input type="text" id="menu-name" name="name" required>
+<div class="container mx-auto px-4 py-8">
+    {% if action == 'list' %}
+        <h1 class="text-3xl font-bold mb-6 text-center">Liste des Menus</h1>
+        <div class="flex justify-end mb-4">
+            <a href="{{ path('menu/new') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Créer un Nouveau Menu
+            </a>
         </div>
-        <div>
-            <label for="menu-description">Description</label>
-            <input type="text" id="menu-description" name="description" required>
+
+        {% if menus is empty %}
+            <p class="text-center text-gray-500">Aucun menu trouvé.</p>
+        {% else %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr class="w-full bg-gray-100 border-b border-gray-200">
+                            <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">ID</th>
+                            <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">Image</th>
+                            <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">Titre</th>
+                            <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">Prix</th>
+                            <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">Description</th>
+                            <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">Produits</th>
+                            <th class="text-left py-3 px-4 font-semibold text-sm text-gray-700">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for menu in menus %}
+                            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="py-3 px-4">{{ menu.id }}</td>
+                                <td class="py-3 px-4">
+                                    {% if menu.picture %}
+                                        <img src="{{ asset('images/menu/' ~ menu.picture) }}" alt="{{ menu.title }}" class="w-20 h-20 object-cover rounded-md">
+                                    {% else %}
+                                        <span class="text-gray-400">Pas d'image</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 px-4">{{ menu.title }}</td>
+                                <td class="py-3 px-4">{{ menu.price }} €</td>
+                                <td class="py-3 px-4">{{ menu.description }}</td>
+                                <td class="py-3 px-4">
+                                    {% for product in menu.products %}
+                                        {{ product.name }}{% if not loop.last %}, {% endif %}
+                                    {% else %}
+                                        <span class="text-gray-400">Aucun produit associé</span>
+                                    {% endfor %}
+                                </td>
+                                <td class="py-3 px-4 flex space-x-2">
+                                    <a href="{{ path('menu_show', { 'id': menu.id }) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm">
+                                        Voir
+                                    </a>
+                                    <a href="{{ path('menu_edit', { 'id': menu.id }) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded text-sm">
+                                        Éditer
+                                    </a>
+                                    <form method="post" action="{{ path('menu_delete', { 'id': menu.id }) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce menu ?');" class="inline">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ menu.id) }}">
+                                        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if action == 'new' %}
+        <h1 class="text-3xl font-bold mb-6 text-center">Créer un Nouveau Menu</h1>
+        <div class="max-w-lg mx-auto">
+            {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+            <div>
+                {{ form_label(form.title, 'Titre du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.title, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.title, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.imageFile, 'Image du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.imageFile, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.imageFile, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.price, 'Prix du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.price, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.price, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.description, 'Description du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.description, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.products, 'Produits', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.products, {'attr': {'class': 'form-multiselect mt-1 block w-full'}}) }}
+                {{ form_errors(form.products, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div class="flex justify-end">
+                <a href="{{ path('menu_list') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Annuler
+                </a>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Enregistrer
+                </button>
+            </div>
+            {{ form_end(form) }}
         </div>
-        <div>
-            <label for="menu-price">Price</label>
-            <input type="number" id="menu-price" name="price" required>
+    {% endif %}
+
+    {% if action == 'edit' %}
+        <h1 class="text-3xl font-bold mb-6 text-center">Éditer le Menu : {{ menu.title }}</h1>
+        <div class="max-w-lg mx-auto">
+            {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+            <div>
+                {{ form_label(form.title, 'Titre du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.title, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.title, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.imageFile, 'Image du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.imageFile, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.imageFile, {'attr': {'class': 'text-red-600'}}) }}
+                {% if menu.picture %}
+                    <img src="{{ asset('images/menu/' ~ menu.picture) }}" alt="{{ menu.title }}" class="w-20 h-20 object-cover mt-2 rounded-md">
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form_label(form.price, 'Prix du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.price, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.price, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.description, 'Description du Menu', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-input mt-1 block w-full'}}) }}
+                {{ form_errors(form.description, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.products, 'Produits', {'label_attr': {'class': 'block text-gray-700'}}) }}
+                {{ form_widget(form.products, {'attr': {'class': 'form-multiselect mt-1 block w-full'}}) }}
+                {{ form_errors(form.products, {'attr': {'class': 'text-red-600'}}) }}
+            </div>
+
+            <div class="flex justify-end">
+                <a href="{{ path('menu_list') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Annuler
+                </a>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Enregistrer
+                </button>
+            </div>
+            {{ form_end(form) }}
         </div>
-        <button type="submit">Save Menu</button>
-    </form>
+    {% endif %}
 
-    <h3>Menu Items</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Chef</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="menu-list">
-            {% for menu in menus %}
-                <tr data-id="{{ menu.id }}">
-                    <td>{{ menu.id }}</td>
-                    <td>{{ menu.name }}</td>
-                    <td>{{ menu.description }}</td>
-                    <td>{{ menu.price }}</td>
-                    <td>{{ menu.chef.name }}</td> {# Assurez-vous de changer l'accès au nom de chef selon votre configuration #}
-                    <td>
-                        <button class="edit-menu">Edit</button>
-                        <button class="delete-menu">Delete</button>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <script>
-        document.getElementById('menu-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const menuId = document.getElementById('menu-id').value;
-            const name = document.getElementById('menu-name').value;
-            const description = document.getElementById('menu-description').value;
-            const price = document.getElementById('menu-price').value;
-
-            const url = menuId ? `/chef/menu/edit/${menuId}` : '/chef/menu/create';
-            const method = 'POST';
-
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name: name, description: description, price: price })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    if (menuId) {
-                        const row = document.querySelector(`tr[data-id="${menuId}"]`);
-                        row.children[1].textContent = data.name;
-                        row.children[2].textContent = data.description;
-                        row.children[3].textContent = data.price;
-                    } else {
-                        const tbody = document.getElementById('menu-list');
-                        const row = document.createElement('tr');
-                        row.setAttribute('data-id', data.id);
-                        row.innerHTML = `
-                            <td>${data.id}</td>
-                            <td>${data.name}</td>
-                            <td>${data.description}</td>
-                            <td>${data.price}</td>
-                            <td>${data.chef}</td> {# Assurez-vous de changer l'affichage du nom du chef selon votre configuration #}
-                            <td>
-                                <button class="edit-menu">Edit</button>
-                                <button class="delete-menu">Delete</button>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    }
-
-                    // Reset form
-                    document.getElementById('menu-id').value = '';
-                    document.getElementById('menu-form').reset();
-                }
-            });
-        });
-
-        document.getElementById('menu-list').addEventListener('click', function(event) {
-            if (event.target.classList.contains('edit-menu')) {
-                const row = event.target.closest('tr');
-                const id = row.getAttribute('data-id');
-                const name = row.children[1].textContent;
-                const description = row.children[2].textContent;
-                const price = row.children[3].textContent;
-
-                document.getElementById('menu-id').value = id;
-                document.getElementById('menu-name').value = name;
-                document.getElementById('menu-description').value = description;
-                document.getElementById('menu-price').value = price;
-            }
-
-            if (event.target.classList.contains('delete-menu')) {
-                const row = event.target.closest('tr');
-                const id = row.getAttribute('data-id');
-
-                fetch(`/chef/menu/delete/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        row.remove();
-                    } else {
-                        alert('Error deleting menu item');
-                    }
-                });
-            }
-        });
-    </script>
+    {% if action == 'show' %}
+        <h1 class="text-3xl font-bold mb-6 text-center">Détails du Menu : {{ menu.title }}</h1>
+        <div class="max-w-lg mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-4">
+                {% if menu.picture %}
+                    <img src="{{ asset('images/menu/' ~ menu.picture) }}" alt="{{ menu.title }}" class="w-full h-64 object-cover">
+                {% else %}
+                    <div class="bg-gray-200 w-full h-64 flex items-center justify-center">
+                        <span class="text-gray-500">Pas d'image</span>
+                    </div>
+                {% endif %}
+                <h2 class="text-xl font-bold mt-4">{{ menu.title }}</h2>
+                <p class="mt-2 text-gray-700">Prix : {{ menu.price }} €</p>
+                <p class="mt-2 text-gray-700">{{ menu.description }}</p>
+                <h3 class="text-lg font-semibold mt-4">Produits</h3>
+                <ul class="mt-2">
+                    {% for product in menu.products %}
+                        <li>{{ product.name }}</li>
+                    {% else %}
+                        <li class="text-gray-500">Aucun produit associé</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="flex justify-end p-4">
+                <a href="{{ path('menu_list') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Retour à la Liste
+                </a>
+                <a href="{{ path('menu_edit', { 'id': menu.id }) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                    Éditer
+                </a>
+                <form method="post" action="{{ path('menu_delete', { 'id': menu.id }) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce menu ?');" class="inline">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ menu.id) }}">
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
+
 

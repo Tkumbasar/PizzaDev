@@ -1,13 +1,14 @@
 <?php
-
 namespace App\Controller\Admin;
 
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -16,20 +17,58 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
-   
     public function configureFields(string $pageName): iterable
     {
         return [
-            EmailField::new('email'),
-            TextField::new('password'),
-            ChoiceField::new('roles', 'Roles')
+            TextField::new('email'),
+            ChoiceField::new('roles')
+                ->allowMultipleChoices()
                 ->setChoices([
-                    'ROLE_USER' => 'ROLE_USER',
-                    'ROLE_CHEF' => 'ROLE_CHEF',
-                    'ROLE_CUSTOMER' => 'ROLE_CUSTOMER',
+                    'User' => 'ROLE_USER',
+                    'Customer' => 'ROLE_CUSTOMER',
+                    'Admin' => 'ROLE_ADMIN',
+                    'Super Admin' => 'ROLE_SUPER_ADMIN',
+                    'Chef' => 'ROLE_CHEF',
                 ]),
-            IntegerField::new('is_verified'),
+            TextField::new('password')
+                ->setFormType(PasswordType::class)
+                ->onlyOnForms(), // Assure que le mot de passe est uniquement dans les formulaires
+            BooleanField::new('isVerified'),
+            AssociationField::new('customer'),
+            AssociationField::new('chef'),
         ];
     }
-   
+
+    public function createEntity(string $entityFqcn)
+    {
+        $entity = new User();
+        // Définir isVerified à true lors de la création d'un utilisateur
+        $entity->setVerified(true);
+        return $entity;
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof User) {
+            $this->hashPassword($entityInstance);
+        }
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof User) {
+            $this->hashPassword($entityInstance);
+        }
+        parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    private function hashPassword(User $user): void
+    {
+        if ($user->getPassword()) {
+            $hashedPassword = password_hash($user->getPassword(), PASSWORD_BCRYPT);
+            $user->setPassword($hashedPassword);
+        }
+    }
 }
+

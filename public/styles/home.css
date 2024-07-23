@@ -1,5 +1,5 @@
 .parallax {
-    /* background-image: url('your-background-image.jpg'); */
+    background-image: url('/images/custom_site/ai-generated-8184596_640.png');
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
@@ -15,6 +15,26 @@
 }
 
 .parallax-content {
+    position: relative;
+    z-index: 2;
+}
+.parallax-2 {
+    background-image: url('/images/custom_site/food-7248455_640.png');
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 20vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.parallax-content-2 {
     position: relative;
     z-index: 2;
 }

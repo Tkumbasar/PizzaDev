@@ -3,6 +3,8 @@ namespace App\Controller;
 
 use App\Entity\Menu;
 use App\Entity\Comment;
+use App\Form\MenuType;
+use App\Repository\MenuRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,16 +14,18 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class MenuController extends AbstractController
 {
+
     #[Route('/menus', name: 'menu_list')]
     public function list(EntityManagerInterface $em): Response
     {
         $menus = $em->getRepository(Menu::class)->findAll();
 
-        // Préparer les commentaires par ID de menu pour le rendu
+    // Préparation du tableau des commentaires par menu
         $commentsByMenu = [];
         foreach ($menus as $menu) {
-            $commentsByMenu[$menu->getId()] = $menu->getComments()->toArray();
-        }
+        // Assurez-vous que getComments() retourne une collection valide
+        $commentsByMenu[$menu->getId()] = $menu->getComments()->toArray();
+    }
 
         return $this->render('menu/menu.html.twig', [
             'menus' => $menus,
@@ -31,34 +35,56 @@ class MenuController extends AbstractController
 
    
     #[Route('/menu/{menuId}/comment/add', name: 'comment_add', methods: ['POST'])]
-public function addComment(Request $request, int $menuId, EntityManagerInterface $em): JsonResponse
-{
-    $user = $this->getUser();
+    public function addComment(Request $request, int $menuId, EntityManagerInterface $em): JsonResponse
+    {
+        // Récupération de l'utilisateur connecté
+        $user = $this->getUser();
 
-    if (!$user || !in_array('ROLE_CUSTOMER', $user->getRoles(), true)) {
-        return new JsonResponse(['success' => false, 'message' => 'Vous devez être un client pour ajouter un commentaire.'], Response::HTTP_UNAUTHORIZED);
-    }
+        // Vérification de l'utilisateur et de son rôle
+        if (!$user || !in_array('ROLE_CUSTOMER', $user->getRoles(), true)) {
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Vous devez être un client pour ajouter un commentaire.'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
 
-    $menu = $em->getRepository(Menu::class)->find($menuId);
-    if (!$menu) {
-        return new JsonResponse(['success' => false, 'message' => 'Menu not found.'], Response::HTTP_NOT_FOUND);
-    }
+        // Vérification de l'existence du menu
+        $menu = $em->getRepository(Menu::class)->find($menuId);
+        if (!$menu) {
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Menu not found.'
+            ], Response::HTTP_NOT_FOUND);
+        }
 
-    $text = $request->request->get('comment_text');
-    if ($text) {
+        // Récupération du texte du commentaire
+        $text = $request->request->get('comment_text');
+        if (empty($text)) {
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Le commentaire ne peut pas être vide.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Création d'un nouvel objet Comment
         $comment = new Comment();
         $comment->setComment($text);
         $comment->setCustomer($user->getCustomer());
         $comment->addMenu($menu);
         $comment->setCreatedAt(new \DateTimeImmutable());
 
-         try {
+        try {
+            // Persistance du commentaire dans la base de données
             $em->persist($comment);
             $em->flush();
         } catch (\Exception $e) {
-            return new JsonResponse(['success' => false, 'message' => 'Erreur lors de l\'enregistrement du commentaire : ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse([
+                'success' => false, 
+                'message' => 'Erreur lors de l\'enregistrement du commentaire : ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        // Rendu du commentaire avec le template Twig
         $renderedComment = $this->renderView('comment/_comment.html.twig', ['comment' => $comment]);
 
         return new JsonResponse([
@@ -70,9 +96,6 @@ public function addComment(Request $request, int $menuId, EntityManagerInterface
             ],
             'comment_html' => $renderedComment
         ]);
-    }
-
-    return new JsonResponse(['success' => false, 'message' => 'Le commentaire ne peut pas être vide.']);
     }
 
     #[Route('/comment/{commentId}/remove', name: 'comment_remove', methods: ['POST'])]
@@ -97,5 +120,80 @@ public function addComment(Request $request, int $menuId, EntityManagerInterface
         }
 
         return new JsonResponse(['success' => false, 'message' => 'Erreur lors de la suppression du commentaire.']);
+    }
+
+
+
+     ///// crud de menu
+   
+
+     #[Route('/menu', name: 'menu_index')]
+    public function index(MenuRepository $menuRepository): Response
+    {
+        $menus = $menuRepository->findAll();
+
+        return $this->render('menu/index.html.twig', [
+            'action' => 'list',
+            'menus' => $menus,
+        ]);
+    }
+
+    #[Route('/new', name: 'menu_new')]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $menu = new Menu();
+        $form = $this->createForm(MenuType::class, $menu);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($menu);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('menu_list');
+        }
+
+        return $this->render('menu/index.html.twig', [
+            'action' => 'new',
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/menu/{id}', name: 'menu_show')]
+    public function show(Menu $menu): Response
+    {
+        return $this->render('menu/index.html.twig', [
+            'action' => 'show',
+            'menu' => $menu,
+        ]);
+    }
+
+    #[Route('/menu/{id}/edit', name: 'menu_edit')]
+    public function edit(Request $request, Menu $menu, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(MenuType::class, $menu);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('menu_list');
+        }
+
+        return $this->render('menu/index.html.twig', [
+            'action' => 'edit',
+            'form' => $form->createView(),
+            'menu' => $menu,
+        ]);
+    }
+
+    #[Route('/menu/{id}/delete', name: 'menu_delete', methods: ['POST'])]
+    public function delete(Request $request, Menu $menu, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $menu->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($menu);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('menu_list');
     }
 }

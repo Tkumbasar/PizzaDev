@@ -23,7 +23,9 @@ class MenuCrudController extends AbstractCrudController
         return [
             
             IntegerField::new('price'),
-            ImageField::new('picture')->setUploadDir('public/images/menu_images/'),
+            ImageField::new('picture')
+                ->setUploadDir('public/images/images_chef')
+                ->setBasePath('images/images_chef'), 
             TextEditorField::new('description'),
             TextField::new('title'),
             AssociationField::new('chef'),

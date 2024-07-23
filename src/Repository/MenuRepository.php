@@ -37,7 +37,21 @@ class MenuRepository extends ServiceEntityRepository
 
         return $randomMenus;
     }
+    public function save(Menu $menu, bool $flush = false): void
+    {
+        $this->_em->persist($menu);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
 
+    public function remove(Menu $menu, bool $flush = false): void
+    {
+        $this->_em->remove($menu);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
     //    /**
     //     * @return Menu[] Returns an array of Menu objects
     //     */

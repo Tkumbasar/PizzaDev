@@ -6,7 +6,10 @@ use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 class Menu
 {
@@ -30,7 +33,7 @@ class Menu
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'product')]
+    #[ORM\ManyToMany(targetEntity: Product::class,  mappedBy: 'product')]
     private Collection $products;
 
     #[ORM\ManyToOne(inversedBy: 'chef')]
@@ -46,7 +49,11 @@ class Menu
      * @var Collection<int, Order>
      */
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'orderMenu')]
+    
     private Collection $orders;
+
+    #[Vich\UploadableField(mapping: 'menu_images', fileNameProperty: 'picture')]
+    private ?File $imageFile = null;
 
     public function __construct()
     {
@@ -93,6 +100,15 @@ class Menu
         $this->picture = $picture;
 
         return $this;
+    }
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
     }
 
     public function getDescription(): ?string

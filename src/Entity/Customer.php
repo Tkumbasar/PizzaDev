@@ -52,7 +52,7 @@ class Customer
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'orderCustomer')]
     private Collection $orders;
 
-    #[ORM\OneToOne(inversedBy: 'customer')]
+    #[ORM\OneToOne(inversedBy: 'customer', targetEntity: User::class,)]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userCustomer = null;
 
@@ -63,6 +63,10 @@ class Customer
     }
 
    
+    public function __toString(): string
+    {
+        return $this->name; // Par exemple, utilisez le nom ou un autre attribut unique
+    }
 
     public function getId(): ?int
     {

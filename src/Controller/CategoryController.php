@@ -25,7 +25,6 @@ class CategoryController extends AbstractController
             throw $this->createNotFoundException('Catégorie non trouvée.');
         }
 
-        // Récupérer tous les menus associés aux produits de la catégorie
         $menus = [];
         foreach ($category->getProducts() as $product) {
             foreach ($product->getMenus() as $menu) {

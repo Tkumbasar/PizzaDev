@@ -83,26 +83,27 @@
                         <h3 class="text-lg font-medium mb-4">Ajouter un commentaire pour {{ menu.title }}</h3>
 
                         <!-- Display existing comments -->
-                        <h6 class="text-lg font-medium mb-3">Commentaires existants :</h6>
-                        <ul class="list-disc list-inside mb-4" id="commentsList{{ menu.id }}">
-                            {% if comments_by_menu[menu.id] is empty %}
-                                <li>Aucun commentaire</li>
-                            {% else %}
-                                {% for comment in comments_by_menu[menu.id] %}
-                                    <li id="comment-{{ comment.id }}">
-                                        {% if comment.customer %}
-                                            <strong>{{ comment.customer.name }} :</strong> {{ comment.comment }}
-                                            
-                                            {% if comment.customer.id == app.user.getCustomer().id %}
-                                                <button class="btn btn-danger btn-sm mt-2" data-comment-id="{{ comment.id }}" data-menu-id="{{ menu.id }}" onclick="removeComment(this)">Supprimer</button>
-                                            {% endif %}
-                                        {% else %}
-                                            <strong>Anonyme :</strong> {{ comment.comment }}
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
+                        <!-- Affichage des commentaires pour chaque menu -->
+                {% if comments_by_menu[menu.id] is defined and comments_by_menu[menu.id] is not empty %}
+                <ul>
+                    {% for comment in comments_by_menu[menu.id] %}
+                        {% if comment is not null %}
+                            <li id="comment-{{ comment.id }}">
+                                {% if comment.customer is not null %}
+                                    <strong>{{ comment.customer.name }} :</strong> {{ comment.comment }}
+                                    {% if app.user and comment.customer.id == app.user.customer.id %}
+                                        <button class="btn btn-danger btn-sm mt-2" data-comment-id="{{ comment.id }}" data-menu-id="{{ menu.id }}" onclick="removeComment(this)">Supprimer</button>
+                                    {% endif %}
+                                {% else %}
+                                    <em>Aucun client associé</em>
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucun commentaire disponible pour ce menu.</p>
+            {% endif %}
 
                         <!-- Comment Form -->
                         <form id="commentForm{{ menu.id }}" data-menu-id="{{ menu.id }}" onsubmit="addComment(event)">
@@ -137,60 +138,52 @@
         });
     });
 
-
     function addComment(event) {
-    event.preventDefault();
+        event.preventDefault();
 
-    const form = event.target;
-    const menuId = form.getAttribute('data-menu-id');
-    const formData = new FormData(form);
-    const messageDiv = document.getElementById(`commentMessage${menuId}`);
+        const form = event.target;
+        const menuId = form.getAttribute('data-menu-id');
+        const formData = new FormData(form);
+        const messageDiv = document.getElementById(`commentMessage${menuId}`);
 
-    fetch(`{{ path('comment_add', {'menuId': '__MENU_ID__'}) }}`.replace('__MENU_ID__', menuId), {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data);
+        fetch(`{{ path('comment_add', {'menuId': '__MENU_ID__'}) }}`.replace('__MENU_ID__', menuId), {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update comments list
+                const commentsList = document.getElementById(`commentsList${menuId}`);
+                const newComment = document.createElement('li');
+                newComment.id = `comment-${data.comment.id}`;
+                newComment.innerHTML = `<strong>${data.comment.customerName} :</strong> ${data.comment.comment} <button class="btn btn-danger btn-sm mt-2" data-comment-id="${data.comment.id}" data-menu-id="${menuId}" onclick="removeComment(this)">Supprimer</button>`;
+                commentsList.appendChild(newComment);
 
-        if (data.success) {
-            // Update comments list
-            const commentsList = document.getElementById(`commentsList${menuId}`);
-            const newComment = document.createElement('li');
-            newComment.id = `comment-${data.comment.id}`;
-            newComment.innerHTML = `<strong>${data.comment.customerName} :</strong> ${data.comment.comment} <button class="btn btn-danger btn-sm mt-2" data-comment-id="${data.comment.id}" data-menu-id="${menuId}" onclick="removeComment(this)">Supprimer</button>`;
-            commentsList.appendChild(newComment);
-
-            // Reset the form and show success message
-            form.reset();
-            messageDiv.textContent = 'Commentaire ajouté avec succès !';
-            messageDiv.classList.remove('text-red-500');
-            messageDiv.classList.add('text-green-500');
-            setTimeout(() => {
-                messageDiv.textContent = '';
-            }, 3000);
-        } else {
-            messageDiv.textContent = data.message || 'Erreur lors de l\'ajout du commentaire.';
+                // Reset the form and show success message
+                form.reset();
+                messageDiv.textContent = 'Commentaire ajouté avec succès !';
+                messageDiv.classList.remove('text-red-500');
+                messageDiv.classList.add('text-green-500');
+                setTimeout(() => {
+                    messageDiv.textContent = '';
+                }, 3000);
+            } else {
+                messageDiv.textContent = data.message || 'Erreur lors de l\'ajout du commentaire.';
+                messageDiv.classList.remove('text-green-500');
+                messageDiv.classList.add('text-red-500');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            messageDiv.textContent = 'Erreur lors de l\'ajout du commentaire.';
             messageDiv.classList.remove('text-green-500');
             messageDiv.classList.add('text-red-500');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        messageDiv.textContent = 'Erreur lors de l\'ajout du commentaire.';
-        messageDiv.classList.remove('text-green-500');
-        messageDiv.classList.add('text-red-500');
-    });
+        });
     }
-
-
 
     // Function to handle comment removal via AJAX
     function removeComment(button) {
