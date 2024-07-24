@@ -149,21 +149,12 @@ class MenuController extends AbstractController
             $entityManager->persist($menu);
             $entityManager->flush();
 
-            return $this->redirectToRoute('menu_list');
+            return $this->redirectToRoute('menu_new');
         }
 
         return $this->render('menu/crud-chef.html.twig', [
             'action' => 'new',
             'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route('/menu/{id}', name: 'menu_show')]
-    public function show(Menu $menu): Response
-    {
-        return $this->render('menu/crud-chef.html.twig', [
-            'action' => 'show',
-            'menu' => $menu,
         ]);
     }
 
@@ -176,7 +167,7 @@ class MenuController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('menu_list');
+            return $this->redirectToRoute('menu_edit');
         }
 
         return $this->render('menu/crud-chef.html.twig', [
@@ -194,33 +185,7 @@ class MenuController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('menu_list');
+        return $this->redirectToRoute('menu_delete');
     }
 
-    /**
-     * @Route("/random", name="random_index")
-     */
-    public function randomMenu(MenuRepository $menuRepository): Response
-    {
-        // Récupérer tous les menus
-        $allMenus = $menuRepository->findAll();
-
-        // Vérifier s'il y a assez de menus
-        $totalMenus = count($allMenus);
-        $limit = 3; // Nombre de menus aléatoires à sélectionner
-        $randomMenus = [];
-
-        if ($totalMenus > 0) {
-            // Mélanger les menus
-            shuffle($allMenus);
-
-            // Sélectionner les premiers menus jusqu'à la limite
-            $randomMenus = array_slice($allMenus, 0, min($limit, $totalMenus));
-        }
-
-        // Passer les données à la vue
-        return $this->render('menu/home-menu.html.twig', [
-            'menus' => $randomMenus,
-        ]);
-    }
 }

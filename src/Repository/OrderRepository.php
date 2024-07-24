@@ -18,8 +18,8 @@ class OrderRepository extends ServiceEntityRepository
 
     public function findByUser($user)
     {
-        // Implémentez la logique pour trouver la commande de l'utilisateur
-        // Cela dépend de votre modèle de données exact.
+        // la logique pour trouver la commande de l'utilisateur
+       
         return $this->createQueryBuilder('o')
             ->leftJoin('o.orderCustomer', 'c')
             ->where('c.id = :userId')

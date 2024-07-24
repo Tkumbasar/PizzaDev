@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Chef;
 use App\Entity\Menu;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -38,6 +39,12 @@ class MenuType extends AbstractType
             ])
             ->add('description', TextType::class, [
                 'label' => 'Description du Menu',
+            ])
+            ->add('chef', EntityType::class, [
+                'class' => Chef::class,
+                'choice_label' => 'name', // Assurez-vous que 'name' est un champ dans l'entité Chef
+                'label' => 'Chef',
+                'attr' => ['class' => 'form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50']
             ])
         ;
     }
