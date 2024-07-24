@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class MenuController extends AbstractController
 {
 
-    #[Route('/menus', name: 'menu_list')]
+    #[Route('/menus', name: 'menus_list')]
     public function list(EntityManagerInterface $em): Response
     {
         $menus = $em->getRepository(Menu::class)->findAll();
@@ -132,7 +132,7 @@ class MenuController extends AbstractController
     {
         $menus = $menuRepository->findAll();
 
-        return $this->render('menu/index.html.twig', [
+        return $this->render('menu/crud-chef.html.twig', [
             'action' => 'list',
             'menus' => $menus,
         ]);
@@ -152,7 +152,7 @@ class MenuController extends AbstractController
             return $this->redirectToRoute('menu_list');
         }
 
-        return $this->render('menu/index.html.twig', [
+        return $this->render('menu/crud-chef.html.twig', [
             'action' => 'new',
             'form' => $form->createView(),
         ]);
@@ -161,7 +161,7 @@ class MenuController extends AbstractController
     #[Route('/menu/{id}', name: 'menu_show')]
     public function show(Menu $menu): Response
     {
-        return $this->render('menu/index.html.twig', [
+        return $this->render('menu/crud-chef.html.twig', [
             'action' => 'show',
             'menu' => $menu,
         ]);
@@ -179,7 +179,7 @@ class MenuController extends AbstractController
             return $this->redirectToRoute('menu_list');
         }
 
-        return $this->render('menu/index.html.twig', [
+        return $this->render('menu/crud-chef.html.twig', [
             'action' => 'edit',
             'form' => $form->createView(),
             'menu' => $menu,
@@ -195,5 +195,32 @@ class MenuController extends AbstractController
         }
 
         return $this->redirectToRoute('menu_list');
+    }
+
+    /**
+     * @Route("/random", name="random_index")
+     */
+    public function randomMenu(MenuRepository $menuRepository): Response
+    {
+        // Récupérer tous les menus
+        $allMenus = $menuRepository->findAll();
+
+        // Vérifier s'il y a assez de menus
+        $totalMenus = count($allMenus);
+        $limit = 3; // Nombre de menus aléatoires à sélectionner
+        $randomMenus = [];
+
+        if ($totalMenus > 0) {
+            // Mélanger les menus
+            shuffle($allMenus);
+
+            // Sélectionner les premiers menus jusqu'à la limite
+            $randomMenus = array_slice($allMenus, 0, min($limit, $totalMenus));
+        }
+
+        // Passer les données à la vue
+        return $this->render('menu/home-menu.html.twig', [
+            'menus' => $randomMenus,
+        ]);
     }
 }

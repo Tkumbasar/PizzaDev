@@ -56,9 +56,19 @@ class Chef
     {
         $this->chef = new ArrayCollection();
     }
-
+    
     public function __toString() {
         return $this->name . " " .  $this->firstname;
+    }
+    
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
     }
 
     public function getId(): ?int
@@ -124,15 +134,6 @@ class Chef
         $this->picture = $picture;
 
         return $this;
-    }
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
     }
 
     public function getGender(): ?string

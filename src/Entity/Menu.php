@@ -25,35 +25,33 @@ class Menu
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $picture = null;
-
-    #[ORM\Column(length: 255)]
     private ?string $description = null;
+    
+    #[ORM\Column(length: 255)]
+    private ?string $picture = null;
+    
+    #[Vich\UploadableField(mapping: 'menu_images', fileNameProperty: 'picture')]
+    private ?File $imageFile = null;
 
+    #[ORM\ManyToOne(inversedBy: 'chef')]
+    private ?Chef $chef = null;
     /**
      * @var Collection<int, Product>
      */
     #[ORM\ManyToMany(targetEntity: Product::class,  mappedBy: 'product')]
     private Collection $products;
-
-    #[ORM\ManyToOne(inversedBy: 'chef')]
-    private ?Chef $chef = null;
-
     /**
      * @var Collection<int, Comment>
      */
     #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: 'menus')]
     private Collection $comments;
-
     /**
      * @var Collection<int, Order>
      */
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'orderMenu')]
-    
     private Collection $orders;
+    
 
-    #[Vich\UploadableField(mapping: 'menu_images', fileNameProperty: 'picture')]
-    private ?File $imageFile = null;
 
     public function __construct()
     {
@@ -89,7 +87,17 @@ class Menu
 
         return $this;
     }
+    
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+    }
 
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+    
     public function getPicture(): ?string
     {
         return $this->picture;
@@ -100,15 +108,6 @@ class Menu
         $this->picture = $picture;
 
         return $this;
-    }
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
     }
 
     public function getDescription(): ?string

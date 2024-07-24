@@ -6,7 +6,10 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
@@ -27,15 +30,31 @@ class Product
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
+    
     #[ORM\ManyToOne(inversedBy: 'category')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
-
+    
     /**
      * @var Collection<int, Menu>
      */
     #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'products')]
     private Collection $product;
+    
+    #[Vich\UploadableField(mapping: 'product_images', fileNameProperty: 'picture')]
+    private ?File $imageFile = null;
+    
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
 
     public function __construct()
     {
