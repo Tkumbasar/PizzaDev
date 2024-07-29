@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if action == 'index' %}
+        Liste des Menus
+    {% elseif action == 'new' %}
+        Nouveau Menu
+    {% elseif action == 'edit' %}
+        Modifier le Menu
+    {% elseif action == 'show' %}
+        Détails du Menu
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto mt-8 p-4">
+    {% if action == 'index' %}
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Liste des Menus</h1>
+        <a href="{{ path('menu_new') }}" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 sm:mt-0">
+            Ajouter un nouveau menu
+        </a>
+    </div>
+
+    <div class="overflow-x-auto shadow-lg">
+        <table class="min-w-full bg-white rounded-lg overflow-hidden shadow-md">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Titre</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Prix</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Description</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Image</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for menu in menus %}
+                <tr class="hover:bg-gray-100">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ menu.title }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ menu.price }} €</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        {{ menu.description|length > 50 ? menu.description|slice(0, 50) ~ '...' : menu.description }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        {% if menu.picture %}
+                            <img src="{{ asset('images/menu_images/' ~ menu.picture)  }}" alt="{{ menu.title }}" class="w-16 h-16 object-cover rounded-full mx-auto">
+                        {% else %}
+                            <span class="text-gray-500">Pas d'image</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ path('menu_edit', { id: menu.id }) }}" class="text-yellow-600 hover:text-yellow-900 mr-3">Modifier</a>
+                        <form method="post" action="{{ path('menu_delete', { id: menu.id }) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce menu ?');" class="inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ menu.id) }}">
+                            <button class="text-red-600 hover:text-red-900">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">Aucun menu trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% elseif action == 'new' or action == 'edit' %}
+    <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
+            {% if action == 'new' %}
+                Ajouter un Nouveau Menu
+            {% else %}
+                Modifier le Menu
+            {% endif %}
+        </h1>
+
+        {{ form_start(form) }}
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    {{ form_label(form.title, 'Titre', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.title, {'attr': {'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+                    {{ form_errors(form.title, {'attr': {'class': 'text-red-500 text-xs italic'}}) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.price, 'Prix', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.price, {'attr': {'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+                    {{ form_errors(form.price, {'attr': {'class': 'text-red-500 text-xs italic'}}) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.description, {'attr': {'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+                    {{ form_errors(form.description, {'attr': {'class': 'text-red-500 text-xs italic'}}) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.products, 'Produits', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.products, {'attr': {'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+                    {{ form_errors(form.products, {'attr': {'class': 'text-red-500 text-xs italic'}}) }}
+                    <p class="text-sm text-gray-500 mt-1">Sélectionnez au moins trois produits.</p>
+                </div>
+
+                <div>
+                    {{ form_label(form.imageFile, 'Image', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.imageFile, {'attr': {'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+                    {{ form_errors(form.imageFile, {'attr': {'class': 'text-red-500 text-xs italic'}}) }}
+                </div>
+
+                <button class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    {{ action == 'new' ? 'Enregistrer' : 'Mettre à jour' }}
+                </button>
+            </div>
+        {{ form_end(form) }}
+
+        <a href="{{ path('menu_index') }}" class="mt-4 inline-block bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            Retour à la liste
+        </a>
+    </div>
+
+    {% elseif action == 'show' %}
+    <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Détails du Menu</h1>
+
+        <table class="w-full text-left">
+            <tr>
+                <th class="p-5 font-medium text-gray-700">Titre</th>
+                <td class="p-5 text-gray-800">{{ menu.title }}</td>
+            </tr>
+            <tr>
+                <th class="p-5 font-medium text-gray-700">Prix</th>
+                <td class="p-5 text-gray-800">{{ menu.price }} €</td>
+            </tr>
+            <tr>
+                <th class="p-5 font-medium text-gray-700">Description</th>
+                <td class="p-5 text-gray-800">{{ menu.description }}</td>
+            </tr>
+            <tr>
+                <th class="p-5 font-medium text-gray-700">Image</th>
+                <td class="p-5">
+                    {% if menu.picture %}
+                        <img src="{{ asset('images/menu_images/' ~ menu.picture)  }}" alt="{{ menu.title }}" class="w-32 h-32 object-cover rounded-md">
+                    {% else %}
+                        <span class="text-gray-500">Pas d'image</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th class="p-5 font-medium text-gray-700">Produits</th>
+                <td class="p-5 text-gray-800">
+                    {% for product in menu.products %}
+                        <div class="border-b border-gray-200 py-2">
+                            {{ product.name }} - {{ product.price }} €
+                        </div>
+                    {% else %}
+                        <span class="text-gray-500">Aucun produit associé.</span>
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+
+        <div class="flex flex-col sm:flex-row justify-end mt-4">
+            <a href="{{ path('menu_index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-0 sm:mr-2 mb-2 sm:mb-0">
+                Retour à la liste
+            </a>
+            <a href="{{ path('menu_edit', { id: menu.id }) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-0 sm:mr-2 mb-2 sm:mb-0">
+                Modifier
+            </a>
+            <form method="post" action="{{ asset('images/menu_images/' ~ menu.picture) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce menu ?');" class="inline">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ menu.id) }}">
+                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Supprimer
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

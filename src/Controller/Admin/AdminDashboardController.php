@@ -36,15 +36,15 @@ class AdminDashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToCrud('Menus', 'fas fa-utensils', Menu::class);
-        yield MenuItem::linkToCrud('Customer', 'fas fa-utensils', Customer::class);
-        yield MenuItem::linkToCrud('Chef', 'fas fa-utensils', Chef::class);
-        yield MenuItem::linkToCrud('Product', 'fas fa-utensils', Product::class);
-        yield MenuItem::linkToCrud('Category', 'fas fa-utensils', Category::class);
-        yield MenuItem::linkToCrud('User', 'fas fa-utensils', User::class);
-        yield MenuItem::linkToCrud('Order', 'fas fa-utensils', Order::class);
-        yield MenuItem::linkToCrud('Comment', 'fas fa-utensils', Comment::class);
-        yield MenuItem::linkToCrud('Payment', 'fas fa-utensils', Payment::class);
+        yield MenuItem::linkToCrud('Menus', 'fas fa-list', Menu::class);
+    yield MenuItem::linkToCrud('Customer', 'fas fa-users', Customer::class);
+    yield MenuItem::linkToCrud('Chef', 'fas fa-user', Chef::class); // Exemple d'icône personnalisée, "fas fa-user" pour un chef
+    yield MenuItem::linkToCrud('Product', 'fas fa-box', Product::class); // "fas fa-box" pour un produit
+    yield MenuItem::linkToCrud('Category', 'fas fa-tags', Category::class); // "fas fa-tags" pour une catégorie
+    yield MenuItem::linkToCrud('User', 'fas fa-user', User::class); // "fas fa-user" pour un utilisateur
+    yield MenuItem::linkToCrud('Order', 'fas fa-shopping-cart', Order::class);
+    yield MenuItem::linkToCrud('Comment', 'fas fa-comment', Comment::class); // "fas fa-comment" pour un commentaire
+    yield MenuItem::linkToCrud('Payment', 'fas fa-credit-card', Payment::class);
        
     }
 }

@@ -6,7 +6,7 @@ use App\Entity\Menu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -22,16 +22,19 @@ class MenuCrudController extends AbstractCrudController
     {
         return [
             
-            IntegerField::new('price'),
+            MoneyField::new('price')-> setCurrency('EUR'),
             ImageField::new('picture')
-                ->setUploadDir('public/images/images_chef')
-                ->setBasePath('images/images_chef'), 
+                ->setUploadDir('public/images/menu_images')
+                ->setBasePath('images/menu_images')
+                ->setRequired(false),
             TextEditorField::new('description'),
             TextField::new('title'),
             AssociationField::new('chef'),
-            AssociationField::new('products')->setFormTypeOptions([
-                'by_reference' => false,
-            ])
+            AssociationField::new('products', 'Produits')
+                ->setFormTypeOptions([
+                    'by_reference' => false,
+                    'choice_label' => 'name', // Utilisez 'name' pour afficher le nom des produits
+                ])
         ];
     }
 

@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produits par Catégorie{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto p-10">
+        <h1 class="text-2xl font-bold my-6 text-center">Nos Produits</h1>
+
+        {% for category, products in products_by_category %}
+            <h2 class="text-2xl text-center bg-gradient-to-r from-purple-400 to-blue-200 font-semibold py-5 my-5">
+                {{ category }}
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3  gap-6">
+                {% if products is empty %}
+                    <div class="col-span-1">
+                        <p class="text-center text-gray-500">Aucun produit dans cette catégorie.</p>
+                    </div>
+                {% else %}
+                
+                {% for product in products %}
+                <div class="bg-white shadow-lg rounded-lg flex flex-col h-full overflow-hidden">
+                    <!-- Zone de l'image -->
+                    <div class="w-full h-80">
+                        {% if product.picture %}
+                            <img src="{{ asset('images/product_images/' ~ product.picture) }}" class="w-full h-full object-cover" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200" class="w-full h-full object-cover" alt="Image non disponible">
+                        {% endif %}
+                    </div>
+            
+                    <!-- Zone de contenu -->
+                    <div class="p-6 flex flex-col flex-grow bg-gray-700">
+                        <h5 class="text-xl font-bold mb-2 bg-gradient-to-r from-red-400 to-yellow-200 rounded">{{ product.name }}</h5>
+                        <p class="text-white mb-4 flex-grow">{{ product.description|length > 100 ? product.description|slice(0, 100) ~ '...' : product.description }}</p>
+                        <p class="text-lg font-semibold mb-4 bg-gradient-to-r from-purple-400 to-blue-200 rounded">{{ product.price }} €</p>
+            
+                        <!-- Zone du bouton d'action -->
+                        <div class="mt-auto ">
+                            {% if is_granted('ROLE_CUSTOMER') %}
+                                <!-- Utilisateur avec le rôle "Customer" -->
+                                <button type="button" class=" w-full text-lg bg-blue-500 text-center text-white px-4 py-2 rounded hover:bg-blue-600">
+                                    Commander
+                                </button>
+                            {% else %}
+                                <!-- Utilisateur sans le rôle "Customer" -->
+                                <button type="button" class="text-lg w-full bg-blue-500 text-center text-white px-4 py-2 rounded hover:bg-blue-600" onclick="showLoginMessage()">
+                                    Commander
+                                </button>
+                                <script>
+                                    function showLoginMessage() {
+                                        alert("Vous devez être connecté en tant que client pour passer une commande.");
+                                    }
+                                </script>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+           
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

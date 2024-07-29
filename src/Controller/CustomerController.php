@@ -55,7 +55,6 @@ class CustomerController extends AbstractController
             $this->entityManager->persist($customer);
             $this->entityManager->flush();
 
-            //on reco l'utisateur car il change de rôle
             $token = new UsernamePasswordToken($user,'main', $user->getRoles());
             $tokenStorage->setToken($token);
 
@@ -98,6 +97,6 @@ class CustomerController extends AbstractController
         $tokenStorage->setToken($token);
 
         $this->addFlash('success', 'Profile deleted successfully!');
-        return $this->redirectToRoute('customer_profile');
+        return $this->redirectToRoute('app_home');
     }
 }

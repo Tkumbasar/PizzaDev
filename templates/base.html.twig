@@ -50,23 +50,42 @@
                 </div>
                 <div class="items-center justify-between hidden w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
                     <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-                        <li>
-                            <a href="{{path('app_home')}}" class="block py-2 pl-3 pr-4 text-orange-600 hover:text-gray-900 dark:hover:text-orange" aria-current="page">Home</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('menus_list')}}" class="block py-2 pl-3 pr-4 text-purple-600 hover:text-gray-900 dark:hover:text-purple">Menus</a>
-                        </li>
-                        <li>
-                            <a href="{{path('app_contact')}}" class="block py-2 pl-3 pr-4 text-blue-600 hover:text-gray-900 dark:hover:text-blue">Contact</a>
-                        </li>
-                        <li>
-                            <a href="{{path('products_list')}}" class="block py-2 pl-3 pr-4 text-blue-600 hover:text-gray-900 dark:hover:text-blue">Produits</a>
-                        </li>
-                        <li>
-                            {% if app.user and 'ROLE_CHEF' in app.user.roles %}
-                            <a href="{{path('menu_index')}}" class="block py-2 pl-3 pr-4 text-blue-600 hover:text-gray-900 dark:hover:text-blue">Menus Du Chef</a>
-                            {% endif %}
-                        </li>
+                        {% if not is_granted('ROLE_CHEF') %}
+                            <li>
+                                <a href="{{path('app_home')}}" class="block py-2 pl-3 pr-4 text-orange-600 hover:text-gray-900 dark:hover:text-orange" aria-current="page">Home</a>
+                            </li>
+                            
+                            <li>
+                                <a href="{{ path('menus_list')}}" class="block py-2 pl-3 pr-4 text-purple-600 hover:text-gray-900 dark:hover:text-purple">Menus</a>
+                            </li>
+                            <li>
+                                <a href="{{path('products_by_category')}}" class="block py-2 pl-3 pr-4 text-blue-600 hover:text-gray-900 dark:hover:text-blue">Produits</a>
+                            </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_CHEF') %}
+                            <li>
+                                <a href="{{ path('chef_index') }}" class="block py-2 pl-3 pr-4 text-green-600 hover:text-gray-900 dark:hover:text-green">Profile du Chef</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('menu_new') }}" class="block py-2 pl-3 pr-4 text-green-600 hover:text-gray-900 dark:hover:text-green">Création du Chef</a>
+                            </li>
+                            <li>
+                                <a href="{{ path('menu_index') }}" class="block py-2 pl-3 pr-4 text-green-600 hover:text-gray-900 dark:hover:text-green">Modification du Chef</a>
+                            </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_CUSTOMER') %}
+                            <li>
+                                <a href="{{ path('chef_index') }}" class="block py-2 pl-3 pr-4 text-green-600 hover:text-gray-900 dark:hover:text-green">Votre Profile</a>
+                            </li>
+                            <li>
+                                <a href="{{path('app_contact')}}" class="block py-2 pl-3 pr-4 text-blue-600 hover:text-gray-900 dark:hover:text-blue">Contact</a>
+                            </li>
+                        {% endif %}
+                               
+
+
+                        
+                      
                     </ul>
                 </div>
             </div>
@@ -78,7 +97,7 @@
         {% endblock %}   
     </main>
 
-    <footer class=" bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-200">
+    <footer class="bg-gradient-to-r from-purple-400 via-indigo-300 to-blue-200">
         <div class="w-full max-w-screen-xl mx-auto p-2 md:py-2">
             <div class="sm:flex sm:items-center sm:justify-between p-3">
                 <a href="{{path('app_home')}}" class="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse">
@@ -90,7 +109,7 @@
                         <a href="{{path('app_home')}}" class="hover:underline me-4 md:me-6 text-orange-400 hover:text-gray-900 dark:hover:text-orange">Accueil</a>
                     </li>
                     <li>
-                        <a href="{{ path('menus_list')}}" class="hover:underline me-4 md:me-6 text-purple-400 hover:text-gray-900 dark:hover:text-purple">Menus</a>
+                        <a href="{{ path('menu_index')}}" class="hover:underline me-4 md:me-6 text-purple-400 hover:text-gray-900 dark:hover:text-purple">Menus</a>
                     </li>
                     <li>
                         <a href="{{path('app_contact')}}" class="hover:underline">Contact</a>
@@ -99,7 +118,8 @@
             </div>
             <hr class="border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-2" />
             <div class="px-4  md:flex md:items-center md:justify-between">
-                <span class="text-sm text-gray-500 dark:text-gray-300 sm:text-center">© 2024 <a href="{{path('app_rgpd')}}">PizzaDev™</a>. Tous droits réservés.
+                <span class="text-sm text-gray-500 dark:text-gray-300 sm:text-center">
+                    © 2024 <a href="{{ path('app_rgpd') }}">PizzaDev</a>Tous droits réservés
                 </span>
                 <div class="flex mt-4 sm:justify-center md:mt-0 space-x-5 rtl:space-x-reverse">
                     <a href="#" class="text-orange-400 hover:text-gray-900 dark:hover:text-orange">

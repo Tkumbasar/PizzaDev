@@ -2,21 +2,58 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Menus pour la catégorie {{ category.name }}</h1>
+<div >
 
-    <div>
-        {% if menus is not empty %}
-            <ul>
-                {% for menu in menus %}
-                    <li>
-                        <h2>{{ menu.name }}</h2>
-                        <p>{{ menu.description }}</p>
-                        {# Ajoutez d'autres informations sur le menu ici #}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Aucun menu disponible pour cette catégorie.</p>
-        {% endif %}
+    
+    <div class="container mx-auto p-6">
+        <header class="mb-6">
+            <h1 class="text-4xl font-extrabold text-gray-900">Gestion des Catégories</h1>
+        </header>
+
+        <!-- Formulaire de Création de Catégorie -->
+        <div class="bg-white p-8 rounded-lg shadow-lg mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Ajouter une Nouvelle Catégorie</h2>
+            {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+            
+            <!-- Champ du Nom -->
+            <div class="mb-4">
+                {{ form_label(form.name, 'Nom de la Catégorie', {'label_attr': {'class': 'block text-gray-700 font-semibold mb-2'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50'}}) }}
+                {{ form_errors(form.name) }}
+            </div>
+
+            <!-- Autres Champs -->
+            <!-- Ajoutez d'autres champs ici si nécessaire -->
+
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">Créer</button>
+            {{ form_end(form) }}
+        </div>
+
+        <!-- Liste des Catégories -->
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Liste des Catégories</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for category in categories %}
+            <div class="bg-white p-6 rounded-lg shadow-lg flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ category.name }}</h3>
+                </div>
+                <div>
+                    <!-- Formulaire de Suppression -->
+                    <form method="post" action="{{ path('app_category') }}" style="display:inline;">
+                        <input type="hidden" name="delete_id" value="{{ category.id }}">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-span-1 sm:col-span-2 lg:col-span-3">
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <p class="text-gray-500">Aucune catégorie disponible</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+
+</div>
 {% endblock %}

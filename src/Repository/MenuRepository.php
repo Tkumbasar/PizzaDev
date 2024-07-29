@@ -12,7 +12,8 @@ class MenuRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Menu::class);
     }
-       
+    
+
     /**
      * Trouve un nombre aléatoire de menus.
      *

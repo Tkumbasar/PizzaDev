@@ -39,11 +39,32 @@ class ProductRepository extends ServiceEntityRepository
             $products = $this->paginatorInterface->paginate(
             $query, // Query à paginer
             $page, // Numéro de page
-            2 // Nombre d'éléments par page
+            3// Nombre d'éléments par page
            );
 
            return $products;
        }
+       public function findAllGroupedByCategory(): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.category', 'c')
+            ->addSelect('c')
+            ->orderBy('c.name', 'ASC')
+            ->addOrderBy('p.name', 'ASC');
+
+        $results = $qb->getQuery()->getResult();
+
+        $grouped = [];
+        foreach ($results as $product) {
+            $categoryName = $product->getCategory() ? $product->getCategory()->getName() : 'Non classifié';
+            if (!isset($grouped[$categoryName])) {
+                $grouped[$categoryName] = [];
+            }
+            $grouped[$categoryName][] = $product;
+        }
+
+        return $grouped;
+    }
 
 
 //    /**

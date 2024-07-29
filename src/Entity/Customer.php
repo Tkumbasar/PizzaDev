@@ -38,14 +38,6 @@ class Customer
     #[ORM\Column(length: 255)]
     private ?string $adress = null;
 
-   
-
-    /**
-     * @var Collection<int, Comment>
-     */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'customer')]
-    private Collection $comments;
-
     /**
      * @var Collection<int, Order>
      */
@@ -56,12 +48,19 @@ class Customer
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userCustomer = null;
 
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'customer')]
+    private Collection $comments;
+
+   
+
     public function __construct()
     {
-        $this->comments = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->comments = new ArrayCollection();  
     }
-
    
     public function __toString(): string
     {
@@ -157,37 +156,6 @@ class Customer
         return $this;
     }
 
-
-    /**
-     * @return Collection<int, Comment>
-     */
-    public function getComments(): Collection
-    {
-        return $this->comments;
-    }
-
-    public function addComment(Comment $comment): static
-    {
-        if (!$this->comments->contains($comment)) {
-            $this->comments->add($comment);
-            $comment->setCustomer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): static
-    {
-        if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
-            if ($comment->getCustomer() === $this) {
-                $comment->setCustomer(null);
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Order>
      */
@@ -227,7 +195,34 @@ class Customer
         return $this;
     }
 
-   
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
 
-    
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getCustomer() === $this) {
+                $comment->setCustomer(null);
+            }
+        }
+
+        return $this;
+    }
+  
 }

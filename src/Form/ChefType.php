@@ -24,6 +24,7 @@ class ChefType extends AbstractType
         ->add('imageFile', VichImageType::class, [
             'required' => false,
             'download_uri' => false,
+            'mapped' => false,
             'label' => 'Profile Picture',
         ])
         ->add('gender', ChoiceType::class, [

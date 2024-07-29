@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[Vich\Uploadable]
@@ -44,18 +45,30 @@ class Chef
     #[ORM\OneToMany(targetEntity: Menu::class, mappedBy: 'chef')]
     private Collection $chef;
 
-    #[ORM\OneToOne(inversedBy: 'chef', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'chef', cascade: ['persist','remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userChef = null;
 
     #[Vich\UploadableField(mapping: 'chef_images', fileNameProperty: 'picture')]
     private ?File $imageFile = null;
 
-    
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'chef')]
+    private Collection $product;
+
     public function __construct()
     {
-        $this->chef = new ArrayCollection();
+        $this->product = new ArrayCollection();
     }
+
+    
+   
+    /**
+     * @var Collection<int, Product>
+     */
+    
     
     public function __toString() {
         return $this->name . " " .  $this->firstname;
@@ -129,7 +142,7 @@ class Chef
         return $this->picture;
     }
 
-    public function setPicture(string $picture): static
+    public function setPicture(?string $picture): static
     {
         $this->picture = $picture;
 
@@ -189,8 +202,36 @@ class Chef
 
         return $this;
     }
-    
-   
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProduct(): Collection
+    {
+        return $this->product;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->product->contains($product)) {
+            $this->product->add($product);
+            $product->setChef($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->product->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getChef() === $this) {
+                $product->setChef(null);
+            }
+        }
+
+        return $this;
+    }
 
 
 }

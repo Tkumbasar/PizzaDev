@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -24,7 +25,7 @@ class Product
     #[ORM\Column]
     private ?int $price = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $picture = null;
 
     #[ORM\Column(length: 255)]
@@ -39,31 +40,42 @@ class Product
      * @var Collection<int, Menu>
      */
     #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'products')]
+    #[Assert\Count(
+        min: 3,
+        minMessage: 'Vous devez sélectionner au moins trois produits.'
+    )]
     private Collection $product;
     
     #[Vich\UploadableField(mapping: 'product_images', fileNameProperty: 'picture')]
     private ?File $imageFile = null;
-    
 
+    #[ORM\ManyToOne(inversedBy: 'product')]
+    private ?Chef $chef = null;
+
+    
+    public function __construct()
+    {
+        $this->product = new ArrayCollection();
+       
+        
+    }
+    
+    public function __toString()
+    {
+        return $this->name;
+    }
+    
     public function setImageFile(?File $imageFile = null): void
     {
         $this->imageFile = $imageFile;
+        if ($imageFile === null) {
+            $this->picture = null;
+        }
     }
 
     public function getImageFile(): ?File
     {
         return $this->imageFile;
-    }
-
-
-    public function __construct()
-    {
-        $this->product = new ArrayCollection();
-    }
-
-    public function __toString()
-    {
-        return $this->name;
     }
 
     public function getId(): ?int
@@ -100,7 +112,7 @@ class Product
         return $this->picture;
     }
 
-    public function setPicture(string $picture): static
+    public function setPicture(?string $picture): static
     {
         $this->picture = $picture;
 
@@ -154,4 +166,19 @@ class Product
 
         return $this;
     }
+
+    public function getChef(): ?Chef
+    {
+        return $this->chef;
+    }
+
+    public function setChef(?Chef $chef): static
+    {
+        $this->chef = $chef;
+
+        return $this;
+    }
+
+   
+
 }

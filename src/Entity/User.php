@@ -33,10 +33,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'userCustomer', targetEntity:Customer::class , cascade: ['persist', 'remove'])]
     private ?Customer $customer = null;
 
-    #[ORM\OneToOne(mappedBy: 'userChef', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'userChef', cascade: ['persist','remove'])]
     private ?Chef $chef = null;
 
-    
+   
     public function getId(): ?int
     {
         return $this->id;
@@ -123,8 +123,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        
     }
 
     public function isVerified(): bool
@@ -152,7 +151,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             return $this;
         }
 
-        // set the owning side of the relation if necessary
         if ($customer->getUserCustomer() !== $this) {
             $customer->setUserCustomer($this);
         }
@@ -173,18 +171,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($chef === null) {
             $this->chef = null;
             return $this;
-        }
-        
+        }    
         $this->chef = $chef;
         // set the owning side of the relation if necessary
-        if ($chef->getUserChef() !== $this) {
-            $chef->setUserChef($this);
+        $newUserChef = null === $chef ? null : $this;
+        if ($chef->getUserChef() !== $newUserChef) {
+            $chef->setUserChef($newUserChef);
         }
-        
-
-       
-
         return $this;
     }
-
 }

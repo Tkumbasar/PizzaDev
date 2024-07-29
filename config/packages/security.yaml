@@ -46,23 +46,10 @@ security:
 
 
     access_control:
-        # Super admin a accès à tout
-        # - { path: ^/admin, roles: ROLE_SUPER_ADMIN }
-        # # Admin a accès aux routes admin
+       
+        # - { path: ^/profile, roles: ROLE_USER }
         # - { path: ^/admin, roles: ROLE_ADMIN }
-        
-        # - { path: ^/chef, roles: ROLE_CHEF }
-        - { path: ^/profile, roles: ROLE_USER }
-        # - { path: ^/dasboard, roles: ROLE_USER }
-
-        # - { path: ^/order, roles: ROLE_CUSTOMER }
-        # - { path: ^/payment, roles: ROLE_CUSTOMER }
-
-        # - { path: ^/chef/profile, roles: ROLE_CHEF }
-        # - { path: ^/chef/menu, roles: ROLE_CHEF }
-        # - { path: ^/chef/menu/create, roles: ROLE_CHEF }
-        # - { path: ^/chef/menu/edit, roles: ROLE_CHEF }
-        # - { path: ^/chef/menu/delete, roles: ROLE_CHEF }
+       
       
 
 when@test:

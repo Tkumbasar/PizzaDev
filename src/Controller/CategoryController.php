@@ -1,74 +1,51 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Category;
-use App\Entity\Menu;
-use App\Entity\Comment;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use App\Form\CategoryType;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Form\CommentType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class CategoryController extends AbstractController
 {
-    /**
-     * @Route("/category/{id}/menus", name="category_menus", requirements={"id"="\d+"})
-     */
-    public function showCategoryMenus(int $id, Request $request, EntityManagerInterface $em): Response
+    #[Route('/category', name: 'app_category', methods: ['GET', 'POST'])]
+    public function index(Request $request, CategoryRepository $categoryRepository, EntityManagerInterface $entityManager): Response
     {
-        $category = $em->getRepository(Category::class)->find($id);
+        // Création de la catégorie
+        $category = new Category();
+        $form = $this->createForm(CategoryType::class, $category);
+        $form->handleRequest($request);
 
-        if (!$category) {
-            throw $this->createNotFoundException('Catégorie non trouvée.');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($category);
+            $entityManager->flush();
+            $this->addFlash('success', 'Catégorie créée avec succès !');
+            return $this->redirectToRoute('app_category');
         }
 
-        $menus = [];
-        foreach ($category->getProducts() as $product) {
-            foreach ($product->getMenus() as $menu) {
-                if (!in_array($menu, $menus)) {
-                    $menus[] = $menu;
-                }
+        // Suppression de la catégorie
+        if ($request->isMethod('POST')) {
+            $id = $request->request->get('delete_id');
+            $categoryToDelete = $categoryRepository->find($id);
+
+            if ($categoryToDelete) {
+                $entityManager->remove($categoryToDelete);
+                $entityManager->flush();
+                $this->addFlash('success', 'Catégorie supprimée avec succès !');
+                return $this->redirectToRoute('app_category');
             }
         }
 
-        $formViews = [];
-        $commentsByMenu = [];
-        if ($this->getUser()) {
-            $customer = $this->getUser()->getCustomer();
+        // Récupération de toutes les catégories
+        $categories = $categoryRepository->findAll();
 
-            foreach ($menus as $menu) {
-                $comment = new Comment();
-                $form = $this->createForm(CommentType::class, $comment);
-                $form->handleRequest($request);
-
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $comment->setCustomer($customer);
-                    $comment->setMenu($menu);
-
-                    $em->persist($comment);
-                    $em->flush();
-
-                    $this->addFlash('success', 'Votre commentaire a été ajouté.');
-                    return $this->redirectToRoute('category_menus', ['id' => $id]);
-                }
-
-                $formViews[$menu->getId()] = $form->createView();
-
-                // Récupérer les commentaires pour chaque Menu
-                $commentsByMenu[$menu->getId()] = $menu->getComments();
-            }
-        }
-
-        return $this->render('category/menus.html.twig', [
-            'category' => $category,
-            'menus' => $menus,
-            'form_views' => $formViews,
-            'comments_by_menu' => $commentsByMenu,
+        return $this->render('category/index.html.twig', [
+            'categories' => $categories,
+            'form' => $form->createView(),
         ]);
     }
 }
-
-

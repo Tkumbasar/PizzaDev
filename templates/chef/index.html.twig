@@ -3,49 +3,84 @@
 {% block title %}Chef Profile{% endblock %}
 
 {% block body %}
-    <div class="container mx-auto p-6 max-w-lg">
-        <h1 class="text-3xl font-bold mb-6">Chef Profile</h1>
+<div class="container mx-auto p-6 max-w-lg">
+    <div class="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- Image d'en-tête de la carte -->
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60" alt="Chef Background" class="w-full h-32 sm:h-48 object-cover">
 
-        {{ form_start(form, { 'attr': { 'class': 'space-y-6' } }) }}
-            <div class="grid grid-cols-1 gap-6">
-                <div>
-                    {{ form_row(form.name, { 'attr': { 'class': 'form-input' } }) }}
-                </div>
-                <div>
-                    {{ form_row(form.firstname, { 'attr': { 'class': 'form-input' } }) }}
-                </div>
-                <div>
-                    {{ form_row(form.gender, { 'attr': { 'class': 'form-select' } }) }}
-                </div>
-                <div>
-                    {{ form_row(form.date_of_birthday, { 'attr': { 'class': 'form-input' } }) }}
-                </div>
-                <div>
-                    {{ form_row(form.phone, { 'attr': { 'class': 'form-input' } }) }}
-                </div>
-                <div>
-                    {{ form_row(form.imageFile, { 'attr': { 'class': 'form-input' } }) }}
-                </div>
-            </div>
+        <!-- Contenu de la carte -->
+        <div class="flex flex-col p-6 space-y-6">
+            <h1 class="text-3xl font-bold text-center text-gray-800">Chef Profile</h1>
 
-            <div class="flex justify-end mt-6">
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        {{ form_end(form) }}
+            {{ form_start(form, { 'attr': { 'class': 'space-y-4' } }) }}
+                <!-- Nom -->
+                <div class="flex flex-col">
+                    <label for="{{ form.name.vars.id }}" class="text-sm font-semibold text-gray-700 mb-1">Name</label>
+                    {{ form_widget(form.name, { 'attr': { 'class': 'form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50' } }) }}
+                    {{ form_errors(form.name) }}
+                </div>
 
-        <hr class="my-6">
+                <!-- Prénom -->
+                <div class="flex flex-col">
+                    <label for="{{ form.firstname.vars.id }}" class="text-sm font-semibold text-gray-700 mb-1">First Name</label>
+                    {{ form_widget(form.firstname, { 'attr': { 'class': 'form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50' } }) }}
+                    {{ form_errors(form.firstname) }}
+                </div>
 
-        <form id="delete-form" method="post" action="{{ path('chef_delete') }}" class="mt-4">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ chef.id) }}">
-            <button type="button" onclick="confirmDelete()" class="btn btn-danger">Delete Profile</button>
-        </form>
+                <!-- Genre -->
+                <div class="flex flex-col">
+                    <label for="{{ form.gender.vars.id }}" class="text-sm font-semibold text-gray-700 mb-1">Gender</label>
+                    {{ form_widget(form.gender, { 'attr': { 'class': 'form-select block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50' } }) }}
+                    {{ form_errors(form.gender) }}
+                </div>
+
+                <!-- Date de Naissance -->
+                <div class="flex flex-col">
+                    <label for="{{ form.date_of_birthday.vars.id }}" class="text-sm font-semibold text-gray-700 mb-1">Date of Birth</label>
+                    {{ form_widget(form.date_of_birthday, { 'attr': { 'class': 'form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50' } }) }}
+                    {{ form_errors(form.date_of_birthday) }}
+                </div>
+
+                <!-- Téléphone -->
+                <div class="flex flex-col">
+                    <label for="{{ form.phone.vars.id }}" class="text-sm font-semibold text-gray-700 mb-1">Phone</label>
+                    {{ form_widget(form.phone, { 'attr': { 'class': 'form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50' } }) }}
+                    {{ form_errors(form.phone) }}
+                </div>
+
+                <!-- Fichier Image -->
+                <div class="flex flex-col">
+                    <label for="{{ form.imageFile.vars.id }}" class="text-sm font-semibold text-gray-700 mb-1">Profile Image</label>
+                    {{ form_widget(form.imageFile, { 'attr': { 'class': 'form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50' } }) }}
+                    {{ form_errors(form.imageFile) }}
+                </div>
+
+                <!-- Bouton de soumission -->
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 w-full rounded transition duration-300 ease-in-out">
+                        Save
+                    </button>
+                </div>
+            {{ form_end(form) }}
+
+            <!-- Formulaire de suppression -->
+            <hr class="my-6">
+
+            <form id="delete-form" method="post" action="{{ path('chef_delete') }}" class="flex justify-center">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ chef.id) }}">
+                <button type="button" onclick="confirmDelete()" class="bg-red-500 hover:bg-red-600 text-white w-full font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                    Delete Profile
+                </button>
+            </form>
+        </div>
     </div>
+</div>
 
-    <script>
-        function confirmDelete() {
-            if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-                document.getElementById('delete-form').submit();
-            }
+<script>
+    function confirmDelete() {
+        if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+            document.getElementById('delete-form').submit();
         }
-    </script>
+    }
+</script>
 {% endblock %}

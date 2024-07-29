@@ -2,27 +2,46 @@
     <div class="max-w-screen-xl mx-auto px-4 py-20">
         <!-- Titre Centré -->
         <div class="text-center mb-10">
-            <h2 class="font-bold mb-4">Nos Menus</h2>
-            <h6 class="font-medium">Découvrez nos délices du jour et laissez-vous surprendre !</h6>
+            <h2 class="text-2xl font-bold my-6">Nos Menus</h2>
+            <h6 class="font-medium mb-6">Découvrez nos délices du jour et laissez-vous surprendre !</h6>
         </div>
 
         <!-- Conteneur des Cartes -->
-        <div class="flex flex-wrap -mx-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
             {% for menu in menus %}
-            <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 px-4 py-10 flex justify-center items-center">
-                <div class="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex flex-col h-full w-full max-h-[400px] max-w-[300px]">
-                    <img class="rounded-t-lg w-full h-48 object-cover" src="{{ asset('images/menu_images/' ~ menu.picture) }}" alt="{{ menu.title }}" />
-                    <div class="p-5 flex-grow flex flex-col">
-                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ menu.title }}</h5>
-                        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ menu.description }}</p>
-                        <div class="flex-grow"></div>
-                        <div class="mt-auto">
-                            <p class="mb-3 font-bold text-gray-900 dark:text-white">{{ menu.price }} €</p>
-                            <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Commander</a>
+                <div class="bg-white shadow-lg rounded-lg flex flex-col  h-60 w-45  overflow-hidden">
+                    <!-- Zone de l'image -->
+                    <div class="w-full h-48">
+                        <img class="w-full h-full object-cover" src="{{ asset('images/menu_images/' ~ menu.picture) }}" alt="{{ menu.title }}" />
+                    </div>
+                    
+                    <!-- Zone de contenu -->
+                    <div class="p-6 flex flex-col flex-grow bg-gray-700">
+                        <h5 class="text-xl font-bold mb-2 bg-gradient-to-r from-red-400 to-yellow-200 rounded">{{ menu.title }}</h5>
+                        <p class="text-white mb-4 flex-grow">{{ menu.description }}</p>
+                        <p class="text-lg font-semibold mb-4 bg-gradient-to-r from-purple-400 to-blue-200 rounded">{{ menu.price }} €</p>
+                    
+                        <!-- Zone du bouton d'action -->
+                        <div class="mt-auto ">
+                            {% if is_granted('ROLE_CUSTOMER') %}
+                                <!-- Utilisateur avec le rôle "Customer" -->
+                                <button type="button" class=" w-full text-lg bg-blue-500 text-center text-white px-4 py-2 rounded hover:bg-blue-600">
+                                    Commander
+                                </button>
+                            {% else %}
+                                <!-- Utilisateur sans le rôle "Customer" -->
+                                <button type="button" class="text-lg w-full bg-blue-500 text-center text-white px-4 py-2 rounded hover:bg-blue-600" onclick="showLoginMessage()">
+                                    Commander
+                                </button>
+                                <script>
+                                    function showLoginMessage() {
+                                        alert("Vous devez être connecté en tant que client pour passer une commande.");
+                                    }
+                                </script>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
     </div>

@@ -6,8 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+
+//simple route pour le rgpd
+
 class RgpdController extends AbstractController
 {
+
+    
     #[Route('/rgpd', name: 'app_rgpd')]
     public function index(): Response
     {

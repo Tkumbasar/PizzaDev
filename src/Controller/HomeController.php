@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Repository\MenuRepository;
 use App\Repository\ProductRepository;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +12,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
+    
+    // mis a jour des menu home
     
     #[Route('/', name: 'app_home' )]
     public function index(Request $request, MenuRepository $menuRepository,ProductRepository $productRepository): Response
@@ -32,7 +33,7 @@ class HomeController extends AbstractController
         }
 
         return $this->render('home/index.html.twig', [
-            'products' => $productRepository->findAllPaginated($request->query->getInt('page', 1)),
+            'products' => $productRepository->findAllPaginated($request->query->getInt('page', 2)),
             'menus' => $menus,
             'stripe_public_key' => $_ENV['STRIPE_PUBLIC_KEY']
         ]);

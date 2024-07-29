@@ -7,11 +7,13 @@ use App\Entity\Menu;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vich\UploaderBundle\Form\Type\VichImageType;
+use Symfony\Component\Validator\Constraints as Assert; // N'oubliez pas d'importer les contraintes
 
 class MenuType extends AbstractType
 {
@@ -19,35 +21,56 @@ class MenuType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre du Menu',
-                ])
-            ->add('imageFile', VichImageType::class, [
-                'required' => false,
-                'download_uri' => false,
-                'label' => 'Profile Picture',
+                'label' => 'Titre',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Le titre ne peut pas être vide.',
+                    ]),
+                    new Assert\Length([
+                        'max' => 255,
+                        'maxMessage' => 'Le titre ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
+            ])
+            ->add('price', MoneyType::class, [
+                'label' => 'Prix',
+                'currency' => 'EUR',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Le prix ne peut pas être vide.',
+                    ]),
+                    new Assert\Positive([
+                        'message' => 'Le prix doit être positif.',
+                    ]),
+                ],
+            ])
+            ->add('description', TextType::class, [
+                'label' => 'Description',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'La description ne peut pas être vide.',
+                    ]),
+                ],
             ])
             ->add('products', EntityType::class, [
                 'class' => Product::class,
                 'choice_label' => 'name',
                 'multiple' => true,
-                'by_reference' => false, 
+                'expanded' => false,
+                'label' => 'Produits',
             ])
-            ->add('price', NumberType::class, [
-                'label' => 'Prix du Menu',
-                'html5' => true,
-                'attr' => ['min' => 0],
-            ])
-            ->add('description', TextType::class, [
-                'label' => 'Description du Menu',
-            ])
-            ->add('chef', EntityType::class, [
-                'class' => Chef::class,
-                'choice_label' => 'name', // Assurez-vous que 'name' est un champ dans l'entité Chef
-                'label' => 'Chef',
-                'attr' => ['class' => 'form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50']
-            ])
-        ;
-    }
+            ->add('imageFile', VichImageType::class, [
+                'label' => 'Image',
+                'required' => false,
+                'constraints' => [
+                    new Assert\Image([
+                        'mimeTypesMessage' => 'Veuillez télécharger un fichier image valide.',
+                        'maxSize' => '5M',
+                        'maxSizeMessage' => 'L\'image ne peut pas dépasser 5 Mo.',
+                    ]),
+                ],
+            ]);
+}
 
     public function configureOptions(OptionsResolver $resolver): void
     {

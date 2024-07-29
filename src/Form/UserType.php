@@ -7,6 +7,7 @@ use App\Entity\Customer;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,14 +21,10 @@ class UserType extends AbstractType
             ->add('email', EmailType::class)
             ->add('roles')
             ->add('password', PasswordType::class)
-            ->add('isVerified')
-            ->add('customer', EntityType::class, [
-                'class' => Customer::class,
-                'choice_label' => 'id',
-            ])
-            ->add('chef', EntityType::class, [
-                'class' => Chef::class,
-                'choice_label' => 'id',
+            ->add('isVerified', CheckboxType::class, [
+                'label'    => 'Verified',
+                'required' => false,
+                'mapped'   => false, 
             ])
         ;
     }

@@ -47,12 +47,17 @@ class ChefController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $chef->setImageFile($imageFile);
+            }
+
             if (!in_array('ROLE_CHEF', $user->getRoles(), true)) {
                 $roles = array_merge($user->getRoles(), ['ROLE_CHEF']);
                 $user->setRoles($roles);
                 $this->entityManager->persist($user);
             }
-
+            
             $this->entityManager->persist($chef);
             $this->entityManager->flush();
 
@@ -63,7 +68,7 @@ class ChefController extends AbstractController
             $this->addFlash('success', 'Profile saved successfully!');
             return $this->redirectToRoute('chef_index');
         }
-
+        
         return $this->render('chef/index.html.twig', [
             'form' => $form->createView(),
             'chef' => $chef,
@@ -80,18 +85,21 @@ class ChefController extends AbstractController
         }
 
         $chef = $chefRepository->findOneBy(['userChef' => $user]);
+        
+    
 
         if (!$chef) {
             return new JsonResponse(['message' => 'Profile not found.'], Response::HTTP_BAD_REQUEST);
         }
        
-
         $this->entityManager->remove($chef);
         $this->entityManager->flush();
+        
 
         $user->setRoles(array_diff($user->getRoles(), ['ROLE_CHEF']));
         $user->setChef(null);
-
+      
+       
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
@@ -99,7 +107,7 @@ class ChefController extends AbstractController
         $tokenStorage->setToken($token);
 
         $this->addFlash('success', 'Profile deleted successfully!');
-        return $this->redirectToRoute('chef_index');
+        return $this->redirectToRoute('app_home');
     }
 
 

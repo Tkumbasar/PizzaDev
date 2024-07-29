@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Menus{% endblock %}
+
+{% block body %}
+<h1 class="text-2xl font-bold my-6 text-center">Liste des Menus</h1>
+
+<div class="grid gap-8 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 p-10 m-10">
+    {% if menus is empty %}
+        <p class="text-center">Aucun menu disponible.</p>
+    {% else %}
+        {% for menu in menus %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+                <!-- Zone de l'image -->
+                <div class="w-full h-48">
+                    <img 
+                        src="{% if menu.picture %}{{ asset('images/menu_images/' ~ menu.picture)  }}{% else %}https://via.placeholder.com/400x200?text=Pas+d'image{% endif %}" 
+                        alt="{{ menu.title }}" 
+                        class="w-full h-full object-cover"
+                    >
+                </div>
+
+                <!-- Zone de contenu -->
+                <div class="p-4 flex flex-col flex-grow bg-gray-700 text-white">
+                    <h2 class="text-xl font-semibold m-1 text-center bg-gradient-to-r from-red-400 to-yellow-200 rounded ">{{ menu.title }}</h2>
+                    <p class="text-lg text-white mb-2 flex-grow">{{ menu.description }}</p>
+                    <p class="text-lg font-bold mb-4">{{ menu.price }} €</p>
+
+                    <!-- Bouton pour ouvrir la modal de commentaire -->
+
+                    <div class="mt-auto ">
+                        {% if is_granted('ROLE_CUSTOMER') %}
+                            <!-- Utilisateur avec le rôle "Customer" -->
+                            <button type="button" class=" mb-3 w-full text-lg bg-blue-500 text-center text-white px-4 py-2 rounded hover:bg-blue-600">
+                                Commander
+                            </button>
+                        {% else %}
+                            <!-- Utilisateur sans le rôle "Customer" -->
+                            <button type="button" class="text-lg w-full bg-yellwo-300 text-center text-white px-4 py-2 rounded hover:bg-blue-600" onclick="showLoginMessage()">
+                                Commander
+                            </button>
+                            <script>
+                                function showLoginMessage() {
+                                    alert("Vous devez être connecté en tant que client pour passer une commande.");
+                                }
+                            </script>
+                        {% endif %}
+                    </div>
+              
+             
+                    {% if is_granted('ROLE_CUSTOMER') %}
+                        <button 
+                            type="button" 
+                            class="text-lg bg-blue-500 text-center text-white  px-4 rounded hover:bg-blue-600"
+                            data-modal-target="#commentModal{{ menu.id }}" 
+                            data-modal-toggle="modal"
+                        >
+                            Commenter
+                        </button>
+
+                    <!-- Section Commentaires -->
+                        <div class="mt-4">
+                            <h3 class="text-lg text-start pl-2 font-semibold mb-2 bg-gradient-to-r from-purple-400 to-blue-200 rounded ">Commentaires</h3>
+                            {% if comments_by_menu[menu.id]|default([]) is empty %}
+                                <p>Aucun commentaire pour ce menu.</p>
+                            {% else %}
+                                <ul>
+                                    {% for comment in comments_by_menu[menu.id] %}
+                                        <li class="border-b py-2">
+                                            <strong>{{ comment.customer.name }}:</strong> {{ comment.comment }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Modal pour commenter -->
+            <div id="commentModal{{ menu.id }}" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center">
+                <div class="bg-white rounded-lg p-6 w-full max-w-md relative">
+                    <button 
+                        type="button" 
+                        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700" 
+                        data-modal-close="#commentModal{{ menu.id }}"
+                    >
+                        &times;
+                    </button>
+                    <h3 class="text-lg font-semibold mb-4">Ajouter un commentaire pour "{{ menu.title }}"</h3>
+                    <form action="{{ path('menus_list') }}" method="POST">
+                        <textarea name="comment" class="border rounded-lg p-2 w-full mb-4" placeholder="Votre commentaire..."></textarea>
+                        <input type="hidden" name="menu_id" value="{{ menu.id }}">
+                        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Ajouter Commentaire</button>     
+                    </form>
+                </div>
+            </div>
+
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- JavaScript pour gérer la modal -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fonction pour afficher la modal
+        const openModal = (modalId) => {
+            const modal = document.querySelector(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        };
+    
+        // Fonction pour fermer la modal
+        const closeModal = (modalId) => {
+            const modal = document.querySelector(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        };
+    
+        // Gestion des boutons d'ouverture de modal
+        const openModalButtons = document.querySelectorAll('[data-modal-toggle]');
+        openModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal-target');
+                openModal(modalId);
+            });
+        });
+    
+        // Gestion des boutons de fermeture de modal
+        const closeModalButtons = document.querySelectorAll('[data-modal-close]');
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal-close');
+                closeModal(modalId);
+            });
+        });
+    
+        // Optionnel : Fermer la modal en cliquant à l'extérieur d'elle
+        document.querySelectorAll('.fixed').forEach(modal => {
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal('#' + modal.id);
+                }
+            });
+        });
+    });
+</script>
+    
+{% endblock %}

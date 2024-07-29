@@ -24,10 +24,10 @@ class Menu
     #[ORM\Column]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 1000)]
     private ?string $description = null;
     
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $picture = null;
     
     #[Vich\UploadableField(mapping: 'menu_images', fileNameProperty: 'picture')]
@@ -41,23 +41,31 @@ class Menu
     #[ORM\ManyToMany(targetEntity: Product::class,  mappedBy: 'product')]
     private Collection $products;
     /**
-     * @var Collection<int, Comment>
-     */
-    #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: 'menus')]
-    private Collection $comments;
-    /**
      * @var Collection<int, Order>
      */
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'orderMenu')]
     private Collection $orders;
-    
 
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: 'menu')]
+    private Collection $comments;
+
+   
+
+
+    
+    public function __toString(): string
+    {
+        return $this->title ?? 'Menu sans titre';
+    }
 
     public function __construct()
     {
         $this->products = new ArrayCollection();
-        $this->comments = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->comments = new ArrayCollection();    
     }
 
     public function getId(): ?int
@@ -91,6 +99,9 @@ class Menu
     public function setImageFile(?File $imageFile = null): void
     {
         $this->imageFile = $imageFile;
+        if ($imageFile === null) {
+            $this->picture = null;
+        }
     }
 
     public function getImageFile(): ?File
@@ -161,33 +172,7 @@ class Menu
         return $this;
     }
 
-    /**
-     * @return Collection<int, Comment>
-     */
-    public function getComments(): Collection
-    {
-        return $this->comments;
-    }
-
-    public function addComment(Comment $comment): static
-    {
-        if (!$this->comments->contains($comment)) {
-            $this->comments->add($comment);
-            $comment->addMenu($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): static
-    {
-        if ($this->comments->removeElement($comment)) {
-            $comment->removeMenu($this);
-        }
-
-        return $this;
-    }
-
+    
     /**
      * @return Collection<int, Order>
      */
@@ -210,6 +195,33 @@ class Menu
     {
         if ($this->orders->removeElement($order)) {
             $order->removeOrderMenu($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->addMenu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            $comment->removeMenu($this);
         }
 
         return $this;

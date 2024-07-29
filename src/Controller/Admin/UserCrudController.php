@@ -27,25 +27,23 @@ class UserCrudController extends AbstractCrudController
                     'User' => 'ROLE_USER',
                     'Customer' => 'ROLE_CUSTOMER',
                     'Admin' => 'ROLE_ADMIN',
-                    'Super Admin' => 'ROLE_SUPER_ADMIN',
                     'Chef' => 'ROLE_CHEF',
                 ]),
+
             TextField::new('password')
                 ->setFormType(PasswordType::class)
                 ->onlyOnForms(), // Assure que le mot de passe est uniquement dans les formulaires
             BooleanField::new('isVerified'),
-            AssociationField::new('customer'),
-            AssociationField::new('chef'),
         ];
     }
 
-    public function createEntity(string $entityFqcn)
-    {
-        $entity = new User();
-        // Définir isVerified à true lors de la création d'un utilisateur
-        $entity->setVerified(true);
-        return $entity;
-    }
+    // public function createEntity(string $entity)
+    // {
+    //     $entity = new User();
+    //     // Définir isVerified à true lors de la création d'un utilisateur
+    //     $entity->setVerified(true);
+    //     return $entity;
+    // }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
@@ -68,6 +66,16 @@ class UserCrudController extends AbstractCrudController
         if ($user->getPassword()) {
             $hashedPassword = password_hash($user->getPassword(), PASSWORD_BCRYPT);
             $user->setPassword($hashedPassword);
+        }
+    }
+
+    public function removeEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+    
+        if ($entityInstance instanceof User) {
+            // Assurez-vous que l'entité est correcte avant de la supprimer
+            $entityManager->remove($entityInstance);
+            $entityManager->flush();
         }
     }
 }

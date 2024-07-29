@@ -34,7 +34,9 @@ class ChefCrudController extends AbstractCrudController
                     'Femme' => 'femme',
                     'Autre' => 'autre',
                 ]),
-            AssociationField::new('userChef') 
+                AssociationField::new('userChef', 'User')
+                ->setCrudController(UserCrudController::class) // Assure-toi d'avoir un UserCrudController
+                ->setRequired(true),
         ];
     }
 }
